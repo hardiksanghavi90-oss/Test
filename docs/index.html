@@ -4,38 +4,462 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Elon Feed">
 <title>Elon Musk - Top Substantive Posts</title>
 <style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --viral: #f78166;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0d1117;
-    color: #e6edf3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 16px;
+    padding-top: env(safe-area-inset-top, 16px);
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
     text-align: center;
-    padding: 20px;
+    padding: 20px 0 10px;
   }
-  .setup {
-    max-width: 400px;
+  header h1 {
+    font-size: 1.4em;
+    font-weight: 700;
   }
-  h1 { font-size: 1.3em; margin-bottom: 12px; }
-  p { color: #8b949e; line-height: 1.6; }
-  code {
-    background: #161b22;
-    padding: 2px 6px;
-    border-radius: 4px;
+  header .subtitle {
+    color: var(--muted);
+    font-size: 0.85em;
+    margin-top: 4px;
+  }
+  .info-bar {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 0.75em;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    text-align: left;
+    color: var(--muted);
+    font-size: 0.75em;
+    text-transform: uppercase;
+    padding: 8px 6px;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+  }
+  tr {
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 6px;
+    vertical-align: top;
     font-size: 0.9em;
+  }
+  .rank {
+    font-weight: 700;
+    color: var(--muted);
+    width: 30px;
+    text-align: center;
+  }
+  .summary a {
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.4;
+  }
+  .summary a:hover { color: var(--accent); }
+  .meta {
+    color: var(--muted);
+    font-size: 0.75em;
+    margin-top: 4px;
+  }
+  .stats {
+    font-size: 0.78em;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+  .virality {
+    font-size: 0.78em;
+    white-space: nowrap;
+  }
+  .link a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.85em;
+  }
+  /* Mobile: card layout */
+  @media (max-width: 600px) {
+    thead { display: none; }
+    tr {
+      display: block;
+      background: var(--card);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+    td {
+      display: block;
+      padding: 2px 0;
+      border: none;
+    }
+    .rank {
+      text-align: left;
+      font-size: 0.8em;
+      color: var(--accent);
+    }
+    .rank::before { content: "#"; }
+    .summary { font-size: 1em; margin: 6px 0; }
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .virality { margin-top: 6px; }
+    .link { margin-top: 8px; }
+    .link a {
+      display: inline-block;
+      padding: 6px 16px;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 8px;
+      font-weight: 600;
+    }
+  }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.7em;
+    padding: 20px 0;
   }
 </style>
 </head>
 <body>
-<div class="setup">
-  <h1>Elon Feed Analyzer</h1>
-  <p>This page will be auto-populated once the GitHub Action runs for the first time.</p>
-  <p>Go to the <strong>Actions</strong> tab in your repo and trigger the <code>Elon Feed Analyzer</code> workflow manually, or wait for the daily schedule.</p>
+
+<header>
+  <h1>Elon Musk - Substantive Posts</h1>
+  <div class="subtitle">Filtered: No politics, no promos &mdash; just real takes</div>
+</header>
+
+<div class="info-bar">
+  <span>Updated: March 30, 2026 at 11:10 PM UTC</span>
+  <span>Top 20 posts (last 36h)</span>
 </div>
+
+<table>
+<thead>
+  <tr>
+    <th>#</th>
+    <th>Post</th>
+    <th>Engagement</th>
+    <th>Virality</th>
+    <th>Link</th>
+  </tr>
+</thead>
+<tbody>
+
+            <tr>
+                <td class="rank">1</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038368121241960877" target="_blank" rel="noopener">Yes</a>
+                    <div class="meta">Mar 29, 09:30 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 63.1K</span><br>
+                    <span title="Likes">❤️ 498.4K</span><br>
+                    <span title="Replies">💬 9.8K</span>
+                </td>
+                <td class="virality">🔥🔥🔥 Mega Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038368121241960877" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">2</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038359858010096077" target="_blank" rel="noopener">Falcon Heavy is so beautiful</a>
+                    <div class="meta">Mar 29, 08:57 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 22.5K</span><br>
+                    <span title="Likes">❤️ 265.1K</span><br>
+                    <span title="Replies">💬 11.6K</span>
+                </td>
+                <td class="virality">🔥🔥 Very Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038359858010096077" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">3</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038377745068277809" target="_blank" rel="noopener">💯</a>
+                    <div class="meta">Mar 29, 10:08 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 36.9K</span><br>
+                    <span title="Likes">❤️ 216.4K</span><br>
+                    <span title="Replies">💬 9.1K</span>
+                </td>
+                <td class="virality">🔥🔥 Very Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038377745068277809" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">4</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038481300378775637" target="_blank" rel="noopener">Yup 😂</a>
+                    <div class="meta">Mar 30, 04:59 AM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 16.8K</span><br>
+                    <span title="Likes">❤️ 269.9K</span><br>
+                    <span title="Replies">💬 4.0K</span>
+                </td>
+                <td class="virality">🔥🔥 Very Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038481300378775637" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">5</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038373467461190016" target="_blank" rel="noopener">Grok automatically translating and recommending 𝕏 posts from other languages is starting to work</a>
+                    <div class="meta">Mar 29, 09:51 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 16.9K</span><br>
+                    <span title="Likes">❤️ 236.1K</span><br>
+                    <span title="Replies">💬 11.1K</span>
+                </td>
+                <td class="virality">🔥🔥 Very Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038373467461190016" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">6</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038652258016190906" target="_blank" rel="noopener">Propaganda words work so well</a>
+                    <div class="meta">Mar 30, 04:19 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 23.9K</span><br>
+                    <span title="Likes">❤️ 161.8K</span><br>
+                    <span title="Replies">💬 4.9K</span>
+                </td>
+                <td class="virality">🔥🔥 Very Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038652258016190906" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">7</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038332648591106548" target="_blank" rel="noopener"></a>
+                    <div class="meta">Mar 29, 07:09 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 14.4K</span><br>
+                    <span title="Likes">❤️ 148.2K</span><br>
+                    <span title="Replies">💬 7.0K</span>
+                </td>
+                <td class="virality">🔥🔥 Very Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038332648591106548" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">8</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038480746315493642" target="_blank" rel="noopener">😂💯</a>
+                    <div class="meta">Mar 30, 04:57 AM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 9.1K</span><br>
+                    <span title="Likes">❤️ 143.8K</span><br>
+                    <span title="Replies">💬 2.5K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038480746315493642" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">9</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038396336316563666" target="_blank" rel="noopener">𝕏 Japan posts are amazing 🇯🇵</a>
+                    <div class="meta">Mar 29, 11:22 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 9.7K</span><br>
+                    <span title="Likes">❤️ 131.8K</span><br>
+                    <span title="Replies">💬 4.5K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038396336316563666" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">10</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038379773949562992" target="_blank" rel="noopener">Elevators used to be manually operated and were especially risky if the operator was tired or inebriated. Now, you just get in, press a...</a>
+                    <div class="meta">Mar 29, 10:16 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 7.6K</span><br>
+                    <span title="Likes">❤️ 100.2K</span><br>
+                    <span title="Replies">💬 5.3K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038379773949562992" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">11</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038531319496667561" target="_blank" rel="noopener"></a>
+                    <div class="meta">Mar 30, 08:18 AM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 8.1K</span><br>
+                    <span title="Likes">❤️ 88.9K</span><br>
+                    <span title="Replies">💬 6.5K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038531319496667561" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">12</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038478497296048212" target="_blank" rel="noopener">The mind of humanity</a>
+                    <div class="meta">Mar 30, 04:48 AM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 7.7K</span><br>
+                    <span title="Likes">❤️ 94.4K</span><br>
+                    <span title="Replies">💬 3.8K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038478497296048212" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">13</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038654268694224978" target="_blank" rel="noopener">Japan 𝕏 posts excellent content that is well-deserving of global exposure</a>
+                    <div class="meta">Mar 30, 04:27 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 7.2K</span><br>
+                    <span title="Likes">❤️ 88.8K</span><br>
+                    <span title="Replies">💬 4.6K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038654268694224978" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">14</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038334141566243252" target="_blank" rel="noopener">Delivering 119 satellites to orbit at once! Falcon 9, which can carry ~20 tons to orbit (with a reusable booster &amp; fairing), is a...</a>
+                    <div class="meta">Mar 29, 07:15 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 11.0K</span><br>
+                    <span title="Likes">❤️ 75.2K</span><br>
+                    <span title="Replies">💬 4.7K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038334141566243252" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">15</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038397888884355410" target="_blank" rel="noopener">Only with Grok understanding every language and recommending content can this be done. This has been a long-time goal.</a>
+                    <div class="meta">Mar 29, 11:28 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 8.7K</span><br>
+                    <span title="Likes">❤️ 68.2K</span><br>
+                    <span title="Replies">💬 4.0K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038397888884355410" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">16</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038648039276257592" target="_blank" rel="noopener">Tesla is making a big investment in Japan with service &amp; Superchargers. Many of the parts in Teslas are made in Japan. Panasonic has...</a>
+                    <div class="meta">Mar 30, 04:02 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 6.7K</span><br>
+                    <span title="Likes">❤️ 68.8K</span><br>
+                    <span title="Replies">💬 3.4K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038648039276257592" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">17</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038372219131470111" target="_blank" rel="noopener">Accurate 😂</a>
+                    <div class="meta">Mar 29, 09:46 PM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 6.7K</span><br>
+                    <span title="Likes">❤️ 66.8K</span><br>
+                    <span title="Replies">💬 2.0K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038372219131470111" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">18</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038543165049991618" target="_blank" rel="noopener">Grok gives great advice</a>
+                    <div class="meta">Mar 30, 09:05 AM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 3.8K</span><br>
+                    <span title="Likes">❤️ 40.1K</span><br>
+                    <span title="Replies">💬 6.6K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038543165049991618" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">19</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038532601569481205" target="_blank" rel="noopener">Here you go</a>
+                    <div class="meta">Mar 30, 08:23 AM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 5.2K</span><br>
+                    <span title="Likes">❤️ 35.5K</span><br>
+                    <span title="Replies">💬 4.0K</span>
+                </td>
+                <td class="virality">🔥 Viral</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038532601569481205" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+            <tr>
+                <td class="rank">20</td>
+                <td class="summary">
+                    <a href="https://x.com/elonmusk/status/2038482753042457059" target="_blank" rel="noopener">Yes</a>
+                    <div class="meta">Mar 30, 05:05 AM UTC</div>
+                </td>
+                <td class="stats">
+                    <span title="Retweets">🔁 2.0K</span><br>
+                    <span title="Likes">❤️ 35.4K</span><br>
+                    <span title="Replies">💬 2.2K</span>
+                </td>
+                <td class="virality">📈 Trending</td>
+                <td class="link"><a href="https://x.com/elonmusk/status/2038482753042457059" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
+            </tr>
+</tbody>
+</table>
+
+<footer>
+  Auto-updated daily at 7:00 AM UTC &bull; Powered by GitHub Actions<br>
+  Add to Home Screen for app-like access on iPhone
+</footer>
+
 </body>
 </html>
