@@ -127,7 +127,7 @@ def fetch_posts():
     tweets = client.get_users_tweets(
         id=user_id,
         max_results=MAX_RESULTS,
-        start_time=since.isoformat(),
+        start_time=since.strftime("%Y-%m-%dT%H:%M:%SZ"),
         tweet_fields=["created_at", "public_metrics", "text", "conversation_id"],
         exclude=["retweets", "replies"],
     )
