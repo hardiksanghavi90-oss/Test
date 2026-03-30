@@ -192,7 +192,10 @@ def fetch_posts():
             continue
         if is_promotional(text):
             continue
-        if is_low_effort(text):
+
+        # Keep low-effort posts if they're highly engaged (50K+ score)
+        score = metrics.get("retweet_count", 0) * 3 + metrics.get("like_count", 0) + metrics.get("reply_count", 0) * 2
+        if is_low_effort(text) and score < 50_000:
             continue
 
         # Find parent tweet context if this is a reply
