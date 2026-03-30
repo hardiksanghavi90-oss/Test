@@ -159,9 +159,8 @@ def fetch_posts():
         max_results=MAX_RESULTS,
         start_time=since.strftime("%Y-%m-%dT%H:%M:%SZ"),
         tweet_fields=["created_at", "public_metrics", "text", "conversation_id",
-                       "referenced_tweets", "in_reply_to_user_id"],
+                       "referenced_tweets", "in_reply_to_user_id", "author_id"],
         expansions=["referenced_tweets.id", "referenced_tweets.id.author_id"],
-        tweet_fields_for_expansions=["text", "author_id", "created_at"],
         user_fields=["username", "name"],
         exclude=["retweets"],
     )
