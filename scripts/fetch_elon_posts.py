@@ -1,6 +1,6 @@
 """
-Fetch Elon Musk's posts from X.com, filter out politics/promos,
-and generate a mobile-friendly HTML report.
+Fetch Elon Musk's posts from X.com, filter out politics/promos/low-effort,
+and generate a mobile-friendly HTML report with embedded tweet previews.
 
 Uses Twitter API v2 via tweepy.
 """
@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import re
+import html as html_module
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -21,6 +22,7 @@ import tweepy
 ELON_USERNAME = "elonmusk"
 MAX_RESULTS = 100  # max per request (API limit)
 LOOKBACK_HOURS = 36  # slightly more than 24h to avoid gaps
+MIN_TEXT_LENGTH = 15  # minimum chars of actual text (after removing URLs/emoji)
 
 # Keywords / patterns used for filtering
 POLITICS_KEYWORDS = [
@@ -51,6 +53,25 @@ PROMO_KEYWORDS = [
 POLITICS_RE = re.compile("|".join(POLITICS_KEYWORDS), re.IGNORECASE)
 PROMO_RE = re.compile("|".join(PROMO_KEYWORDS), re.IGNORECASE)
 
+# Regex to strip URLs and emoji for length check
+URL_RE = re.compile(r"https?://\S+")
+EMOJI_RE = re.compile(
+    "["
+    "\U0001F600-\U0001F64F"  # emoticons
+    "\U0001F300-\U0001F5FF"  # symbols & pictographs
+    "\U0001F680-\U0001F6FF"  # transport & map
+    "\U0001F1E0-\U0001F1FF"  # flags
+    "\U00002702-\U000027B0"
+    "\U0001f900-\U0001f9FF"
+    "\U0001FA00-\U0001FA6F"
+    "\U0001FA70-\U0001FAFF"
+    "\U00002600-\U000026FF"
+    "\U0000FE00-\U0000FE0F"
+    "\U0000200D"
+    "]+",
+    flags=re.UNICODE,
+)
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -66,12 +87,19 @@ def is_promotional(text: str) -> bool:
     return matches >= 2
 
 
+def is_low_effort(text: str) -> bool:
+    """Filter out single-word replies, emoji-only, 'Yes', 'Yup', etc."""
+    stripped = URL_RE.sub("", text)
+    stripped = EMOJI_RE.sub("", stripped)
+    stripped = stripped.strip()
+    return len(stripped) < MIN_TEXT_LENGTH
+
+
 def virality_score(metrics: dict) -> str:
     """Return a virality label based on engagement."""
     retweets = metrics.get("retweet_count", 0)
     likes = metrics.get("like_count", 0)
     replies = metrics.get("reply_count", 0)
-    impressions = metrics.get("impression_count", 0)
     score = retweets * 3 + likes + replies * 2
 
     if score > 500_000:
@@ -94,9 +122,9 @@ def format_number(n: int) -> str:
     return str(n)
 
 
-def summarize(text: str, max_len: int = 140) -> str:
-    """Simple summarizer: first sentence or truncated text."""
-    text = re.sub(r"https?://\S+", "", text).strip()
+def summarize(text: str, max_len: int = 200) -> str:
+    """Clean up tweet text for summary display."""
+    text = URL_RE.sub("", text).strip()
     text = re.sub(r"\s+", " ", text)
     if len(text) <= max_len:
         return text
@@ -124,16 +152,36 @@ def fetch_posts():
 
     since = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
 
+    # Fetch tweets INCLUDING replies now (we want reply context)
+    # We use referenced_tweets to find what he's replying to
     tweets = client.get_users_tweets(
         id=user_id,
         max_results=MAX_RESULTS,
         start_time=since.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        tweet_fields=["created_at", "public_metrics", "text", "conversation_id"],
-        exclude=["retweets", "replies"],
+        tweet_fields=["created_at", "public_metrics", "text", "conversation_id",
+                       "referenced_tweets", "in_reply_to_user_id"],
+        expansions=["referenced_tweets.id", "referenced_tweets.id.author_id"],
+        tweet_fields_for_expansions=["text", "author_id", "created_at"],
+        user_fields=["username", "name"],
+        exclude=["retweets"],
     )
 
     if not tweets or not tweets.data:
         return []
+
+    # Build lookup of included tweets (parent tweets he's replying to)
+    included_tweets = {}
+    included_users = {}
+    if tweets.includes:
+        for u in tweets.includes.get("users", []):
+            included_users[u.id] = {"username": u.username, "name": u.name}
+        for t in tweets.includes.get("tweets", []):
+            author = included_users.get(t.author_id, {})
+            included_tweets[t.id] = {
+                "text": t.text,
+                "username": author.get("username", "unknown"),
+                "name": author.get("name", "Unknown"),
+            }
 
     posts = []
     for tweet in tweets.data:
@@ -144,6 +192,22 @@ def fetch_posts():
             continue
         if is_promotional(text):
             continue
+        if is_low_effort(text):
+            continue
+
+        # Find parent tweet context if this is a reply
+        parent_context = None
+        if tweet.referenced_tweets:
+            for ref in tweet.referenced_tweets:
+                if ref.type == "replied_to" and ref.id in included_tweets:
+                    parent = included_tweets[ref.id]
+                    parent_context = {
+                        "text": summarize(parent["text"], 200),
+                        "username": parent["username"],
+                        "name": parent["name"],
+                        "url": f"https://x.com/{parent['username']}/status/{ref.id}",
+                    }
+                    break
 
         posts.append({
             "id": tweet.id,
@@ -156,6 +220,7 @@ def fetch_posts():
             "replies": metrics.get("reply_count", 0),
             "impressions": metrics.get("impression_count", 0),
             "virality": virality_score(metrics),
+            "parent": parent_context,
         })
 
     # Sort by engagement (retweets weighted most)
@@ -171,25 +236,52 @@ def generate_html(posts: list) -> str:
     now = datetime.now(timezone.utc).strftime("%B %d, %Y at %I:%M %p UTC")
 
     if not posts:
-        rows = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#888;">No substantive posts found in the last 36 hours.</td></tr>'
+        cards = '<div class="empty">No substantive posts found in the last 36 hours.</div>'
     else:
-        rows = ""
+        cards = ""
         for i, p in enumerate(posts, 1):
-            rows += f"""
-            <tr>
-                <td class="rank">{i}</td>
-                <td class="summary">
-                    <a href="{p['url']}" target="_blank" rel="noopener">{p['summary']}</a>
-                    <div class="meta">{p['created_at']}</div>
-                </td>
-                <td class="stats">
-                    <span title="Retweets">🔁 {format_number(p['retweets'])}</span><br>
-                    <span title="Likes">❤️ {format_number(p['likes'])}</span><br>
-                    <span title="Replies">💬 {format_number(p['replies'])}</span>
-                </td>
-                <td class="virality">{p['virality']}</td>
-                <td class="link"><a href="{p['url']}" target="_blank" rel="noopener">Open&nbsp;↗</a></td>
-            </tr>"""
+            summary_escaped = html_module.escape(p['summary'])
+
+            # Build parent context block if replying to someone
+            parent_html = ""
+            if p.get("parent"):
+                parent = p["parent"]
+                parent_text = html_module.escape(parent["text"])
+                parent_html = f"""
+                <div class="reply-context">
+                    <div class="reply-label">Replying to @{html_module.escape(parent['username'])}</div>
+                    <a href="{parent['url']}" target="_blank" rel="noopener" class="parent-tweet">
+                        <div class="parent-author">
+                            <strong>{html_module.escape(parent['name'])}</strong>
+                            <span class="parent-handle">@{html_module.escape(parent['username'])}</span>
+                        </div>
+                        <div class="parent-text">{parent_text}</div>
+                    </a>
+                </div>"""
+
+            cards += f"""
+            <div class="card">
+                <div class="card-header">
+                    <span class="rank">#{i}</span>
+                    <span class="virality-badge">{p['virality']}</span>
+                </div>
+                {parent_html}
+                <div class="tweet-embed">
+                    <blockquote class="twitter-tweet" data-theme="dark" data-dnt="true">
+                        <p>{summary_escaped}</p>
+                        &mdash; Elon Musk (@elonmusk)
+                        <a href="{p['url']}">{p['created_at']}</a>
+                    </blockquote>
+                </div>
+                <div class="card-footer">
+                    <div class="stats-row">
+                        <span title="Retweets">🔁 {format_number(p['retweets'])}</span>
+                        <span title="Likes">❤️ {format_number(p['likes'])}</span>
+                        <span title="Replies">💬 {format_number(p['replies'])}</span>
+                    </div>
+                    <a href="{p['url']}" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                </div>
+            </div>"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -208,7 +300,7 @@ def generate_html(posts: list) -> str:
     --text: #e6edf3;
     --muted: #8b949e;
     --accent: #58a6ff;
-    --viral: #f78166;
+    --reply-bg: #1c2128;
   }}
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
   body {{
@@ -218,6 +310,8 @@ def generate_html(posts: list) -> str:
     padding: 16px;
     padding-top: env(safe-area-inset-top, 16px);
     -webkit-text-size-adjust: 100%;
+    max-width: 700px;
+    margin: 0 auto;
   }}
   header {{
     text-align: center;
@@ -239,101 +333,109 @@ def generate_html(posts: list) -> str:
     font-size: 0.75em;
     padding: 8px 0;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }}
-  table {{
-    width: 100%;
-    border-collapse: collapse;
-  }}
-  th {{
-    text-align: left;
+  .empty {{
+    text-align: center;
+    padding: 40px;
     color: var(--muted);
-    font-size: 0.75em;
-    text-transform: uppercase;
-    padding: 8px 6px;
-    border-bottom: 2px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg);
   }}
-  tr {{
-    border-bottom: 1px solid var(--border);
+
+  /* Card layout */
+  .card {{
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
   }}
-  td {{
-    padding: 12px 6px;
-    vertical-align: top;
-    font-size: 0.9em;
+  .card-header {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px 0;
   }}
   .rank {{
     font-weight: 700;
-    color: var(--muted);
-    width: 30px;
-    text-align: center;
+    color: var(--accent);
+    font-size: 0.9em;
   }}
-  .summary a {{
-    color: var(--text);
-    text-decoration: none;
-    line-height: 1.4;
+  .virality-badge {{
+    font-size: 0.78em;
+    white-space: nowrap;
   }}
-  .summary a:hover {{ color: var(--accent); }}
-  .meta {{
+
+  /* Reply context */
+  .reply-context {{
+    margin: 10px 16px 0;
+  }}
+  .reply-label {{
     color: var(--muted);
     font-size: 0.75em;
-    margin-top: 4px;
+    margin-bottom: 6px;
   }}
-  .stats {{
-    font-size: 0.78em;
-    white-space: nowrap;
-    line-height: 1.6;
+  .parent-tweet {{
+    display: block;
+    background: var(--reply-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: var(--text);
   }}
-  .virality {{
-    font-size: 0.78em;
-    white-space: nowrap;
+  .parent-tweet:hover {{
+    border-color: var(--accent);
   }}
-  .link a {{
+  .parent-author {{
+    font-size: 0.82em;
+    margin-bottom: 4px;
+  }}
+  .parent-handle {{
+    color: var(--muted);
+    margin-left: 4px;
+  }}
+  .parent-text {{
+    font-size: 0.85em;
+    color: var(--muted);
+    line-height: 1.4;
+  }}
+
+  /* Tweet embed area */
+  .tweet-embed {{
+    padding: 8px 16px;
+  }}
+  .twitter-tweet {{
+    margin: 0 !important;
+  }}
+
+  /* Footer of each card */
+  .card-footer {{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px 14px;
+    border-top: 1px solid var(--border);
+  }}
+  .stats-row {{
+    display: flex;
+    gap: 14px;
+    font-size: 0.8em;
+  }}
+  .open-btn {{
     color: var(--accent);
     text-decoration: none;
     font-size: 0.85em;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    white-space: nowrap;
   }}
-  /* Mobile: card layout */
-  @media (max-width: 600px) {{
-    thead {{ display: none; }}
-    tr {{
-      display: block;
-      background: var(--card);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 10px;
-      border: 1px solid var(--border);
-    }}
-    td {{
-      display: block;
-      padding: 2px 0;
-      border: none;
-    }}
-    .rank {{
-      text-align: left;
-      font-size: 0.8em;
-      color: var(--accent);
-    }}
-    .rank::before {{ content: "#"; }}
-    .summary {{ font-size: 1em; margin: 6px 0; }}
-    .stats {{
-      display: flex;
-      gap: 12px;
-      margin-top: 6px;
-    }}
-    .virality {{ margin-top: 6px; }}
-    .link {{ margin-top: 8px; }}
-    .link a {{
-      display: inline-block;
-      padding: 6px 16px;
-      background: var(--accent);
-      color: var(--bg);
-      border-radius: 8px;
-      font-weight: 600;
-    }}
+  .open-btn:hover {{
+    background: var(--accent);
+    color: var(--bg);
   }}
+
   footer {{
     text-align: center;
     color: var(--muted);
@@ -346,7 +448,7 @@ def generate_html(posts: list) -> str:
 
 <header>
   <h1>Elon Musk - Substantive Posts</h1>
-  <div class="subtitle">Filtered: No politics, no promos &mdash; just real takes</div>
+  <div class="subtitle">Filtered: No politics, no promos, no low-effort &mdash; just real takes</div>
 </header>
 
 <div class="info-bar">
@@ -354,26 +456,14 @@ def generate_html(posts: list) -> str:
   <span>Top {len(posts)} posts (last 36h)</span>
 </div>
 
-<table>
-<thead>
-  <tr>
-    <th>#</th>
-    <th>Post</th>
-    <th>Engagement</th>
-    <th>Virality</th>
-    <th>Link</th>
-  </tr>
-</thead>
-<tbody>
-{rows}
-</tbody>
-</table>
+{cards}
 
 <footer>
   Auto-updated daily at 7:00 AM UTC &bull; Powered by GitHub Actions<br>
   Add to Home Screen for app-like access on iPhone
 </footer>
 
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>"""
 
