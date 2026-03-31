@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Elon Feed">
-<title>Elon Musk - Top Substantive Posts</title>
+<title>Elon Musk - Business Insights</title>
 <style>
   :root {
     --bg: #0d1117;
@@ -16,6 +16,8 @@
     --muted: #8b949e;
     --accent: #58a6ff;
     --reply-bg: #1c2128;
+    --insight-bg: #1a2332;
+    --insight-border: #1f6feb44;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -56,7 +58,6 @@
     color: var(--muted);
   }
 
-  /* Card layout */
   .card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -80,6 +81,28 @@
     white-space: nowrap;
   }
 
+  /* AI Summary */
+  .ai-summary {
+    margin: 10px 16px 0;
+    background: var(--insight-bg);
+    border: 1px solid var(--insight-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .ai-label {
+    font-size: 0.75em;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ai-summary p {
+    font-size: 0.88em;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
   /* Reply context */
   .reply-context {
     margin: 10px 16px 0;
@@ -94,9 +117,7 @@
     border-radius: 10px;
     overflow: hidden;
   }
-  .parent-embed .twitter-tweet {
-    margin: 0 !important;
-  }
+  .parent-embed .twitter-tweet { margin: 0 !important; }
   .parent-tweet-fallback {
     display: block;
     background: var(--reply-bg);
@@ -106,54 +127,20 @@
     text-decoration: none;
     color: var(--text);
   }
-  .parent-tweet-fallback:hover {
-    border-color: var(--accent);
-  }
-  .parent-author {
-    font-size: 0.82em;
-    margin-bottom: 4px;
-  }
-  .parent-handle {
-    color: var(--muted);
-    margin-left: 4px;
-  }
-  .parent-text {
-    font-size: 0.85em;
-    color: var(--muted);
-    line-height: 1.4;
-  }
+  .parent-tweet-fallback:hover { border-color: var(--accent); }
+  .parent-author { font-size: 0.82em; margin-bottom: 4px; }
+  .parent-handle { color: var(--muted); margin-left: 4px; }
+  .parent-text { font-size: 0.85em; color: var(--muted); line-height: 1.4; }
 
-  /* Tweet embed area */
-  .tweet-embed {
-    padding: 8px 16px;
-  }
-  .tweet-embed .twitter-tweet {
-    margin: 0 !important;
-  }
+  .tweet-embed { padding: 8px 16px; }
+  .tweet-embed .twitter-tweet { margin: 0 !important; }
 
-  /* Fallback styling for when oEmbed fails */
-  .tweet-embed-fallback {
-    padding: 12px 16px;
-  }
-  .tweet-author {
-    font-size: 0.85em;
-    margin-bottom: 6px;
-  }
-  .tweet-handle {
-    color: var(--muted);
-    margin-left: 4px;
-  }
-  .tweet-text {
-    font-size: 1em;
-    line-height: 1.5;
-    margin-bottom: 6px;
-  }
-  .tweet-date {
-    color: var(--muted);
-    font-size: 0.78em;
-  }
+  .tweet-embed-fallback { padding: 12px 16px; }
+  .tweet-author { font-size: 0.85em; margin-bottom: 6px; }
+  .tweet-handle { color: var(--muted); margin-left: 4px; }
+  .tweet-text { font-size: 1em; line-height: 1.5; margin-bottom: 6px; }
+  .tweet-date { color: var(--muted); font-size: 0.78em; }
 
-  /* Footer of each card */
   .card-footer {
     display: flex;
     justify-content: space-between;
@@ -192,12 +179,12 @@
 <body>
 
 <header>
-  <h1>Elon Musk - Substantive Posts</h1>
-  <div class="subtitle">Filtered: No politics, no promos &mdash; just real takes</div>
+  <h1>Elon Musk - Business Insights</h1>
+  <div class="subtitle">Filtered for business, building & strategy &mdash; no politics, no social commentary</div>
 </header>
 
 <div class="info-bar">
-  <span>Updated: March 31, 2026 at 12:42 AM UTC</span>
+  <span>Updated: March 31, 2026 at 01:10 AM UTC</span>
   <span>Top 20 posts (last 36h)</span>
 </div>
 
@@ -208,13 +195,14 @@
                     <span class="virality-badge">🔥🔥🔥 Mega Viral</span>
                 </div>
                 
+                
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="qst" dir="ltr">Yes <a href="https://t.co/FHYPe4xGP1">https://t.co/FHYPe4xGP1</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038368121241960877?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 64.2K</span>
-                        <span title="Likes">❤️ 505.2K</span>
+                        <span title="Retweets">🔁 64.6K</span>
+                        <span title="Likes">❤️ 507.7K</span>
                         <span title="Replies">💬 9.9K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038368121241960877" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -226,13 +214,14 @@
                     <span class="virality-badge">🔥🔥 Very Viral</span>
                 </div>
                 
+                
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Falcon Heavy is so beautiful <a href="https://t.co/tOw7jK7vpF">pic.twitter.com/tOw7jK7vpF</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038359858010096077?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 22.9K</span>
-                        <span title="Likes">❤️ 268.6K</span>
+                        <span title="Retweets">🔁 23.0K</span>
+                        <span title="Likes">❤️ 269.8K</span>
                         <span title="Replies">💬 11.8K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038359858010096077" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -244,14 +233,15 @@
                     <span class="virality-badge">🔥🔥 Very Viral</span>
                 </div>
                 
+                
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="art" dir="ltr">💯 <a href="https://t.co/2qFSUsxQvJ">https://t.co/2qFSUsxQvJ</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038377745068277809?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 38.0K</span>
-                        <span title="Likes">❤️ 221.4K</span>
-                        <span title="Replies">💬 9.3K</span>
+                        <span title="Retweets">🔁 38.3K</span>
+                        <span title="Likes">❤️ 223.0K</span>
+                        <span title="Replies">💬 9.4K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038377745068277809" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
@@ -262,13 +252,14 @@
                     <span class="virality-badge">🔥🔥 Very Viral</span>
                 </div>
                 
+                
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="qst" dir="ltr">Yup 😂 <a href="https://t.co/dSn2D8cAH0">https://t.co/dSn2D8cAH0</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038481300378775637?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 17.4K</span>
-                        <span title="Likes">❤️ 277.8K</span>
+                        <span title="Retweets">🔁 17.6K</span>
+                        <span title="Likes">❤️ 280.4K</span>
                         <span title="Replies">💬 4.1K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038481300378775637" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -280,13 +271,14 @@
                     <span class="virality-badge">🔥🔥 Very Viral</span>
                 </div>
                 
+                
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Grok automatically translating and recommending 𝕏 posts from other languages is starting to work</p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038373467461190016?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 17.4K</span>
-                        <span title="Likes">❤️ 241.3K</span>
+                        <span title="Retweets">🔁 17.5K</span>
+                        <span title="Likes">❤️ 243.0K</span>
                         <span title="Replies">💬 11.2K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038373467461190016" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -298,34 +290,36 @@
                     <span class="virality-badge">🔥🔥 Very Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Propaganda words work so well <a href="https://t.co/nM9CwWkhDQ">https://t.co/nM9CwWkhDQ</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038652258016190906?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
-
-</div>
-                <div class="card-footer">
-                    <div class="stats-row">
-                        <span title="Retweets">🔁 25.9K</span>
-                        <span title="Likes">❤️ 172.5K</span>
-                        <span title="Replies">💬 5.2K</span>
-                    </div>
-                    <a href="https://x.com/elonmusk/status/2038652258016190906" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <span class="rank">#7</span>
-                    <span class="virality-badge">🔥🔥 Very Viral</span>
-                </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="zxx" dir="ltr"><a href="https://t.co/0gUlqj7ncn">pic.twitter.com/0gUlqj7ncn</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038332648591106548?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 14.7K</span>
-                        <span title="Likes">❤️ 150.3K</span>
+                        <span title="Retweets">🔁 14.8K</span>
+                        <span title="Likes">❤️ 150.9K</span>
                         <span title="Replies">💬 7.0K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038332648591106548" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="rank">#7</span>
+                    <span class="virality-badge">🔥 Viral</span>
+                </div>
+                
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="art" dir="ltr">😂💯 <a href="https://t.co/tNlZPZACov">https://t.co/tNlZPZACov</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038480746315493642?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+
+</div>
+                <div class="card-footer">
+                    <div class="stats-row">
+                        <span title="Retweets">🔁 9.6K</span>
+                        <span title="Likes">❤️ 150.5K</span>
+                        <span title="Replies">💬 2.6K</span>
+                    </div>
+                    <a href="https://x.com/elonmusk/status/2038480746315493642" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -334,16 +328,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="art" dir="ltr">😂💯 <a href="https://t.co/tNlZPZACov">https://t.co/tNlZPZACov</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038480746315493642?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">𝕏 Japan posts are amazing 🇯🇵 <a href="https://t.co/bcHpIWr5FV">https://t.co/bcHpIWr5FV</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038396336316563666?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 9.5K</span>
-                        <span title="Likes">❤️ 148.8K</span>
-                        <span title="Replies">💬 2.6K</span>
+                        <span title="Retweets">🔁 10.0K</span>
+                        <span title="Likes">❤️ 135.2K</span>
+                        <span title="Replies">💬 4.5K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038480746315493642" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038396336316563666" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -352,16 +347,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">𝕏 Japan posts are amazing 🇯🇵 <a href="https://t.co/bcHpIWr5FV">https://t.co/bcHpIWr5FV</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038396336316563666?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Japan 𝕏 posts excellent content that is well-deserving of global exposure <a href="https://t.co/C1AZsi8jmW">https://t.co/C1AZsi8jmW</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038654268694224978?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 9.9K</span>
-                        <span title="Likes">❤️ 134.4K</span>
-                        <span title="Replies">💬 4.5K</span>
+                        <span title="Retweets">🔁 8.7K</span>
+                        <span title="Likes">❤️ 108.0K</span>
+                        <span title="Replies">💬 4.8K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038396336316563666" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038654268694224978" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -370,16 +366,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Japan 𝕏 posts excellent content that is well-deserving of global exposure <a href="https://t.co/C1AZsi8jmW">https://t.co/C1AZsi8jmW</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038654268694224978?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Elevators used to be manually operated and were especially risky if the operator was tired or inebriated.<br><br>Now, you just get in, press a button and a modern elevator, if inspected regularly, is extremely safe. <a href="https://t.co/wetvKfvJtH">https://t.co/wetvKfvJtH</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038379773949562992?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 8.4K</span>
-                        <span title="Likes">❤️ 103.9K</span>
-                        <span title="Replies">💬 4.8K</span>
+                        <span title="Retweets">🔁 7.8K</span>
+                        <span title="Likes">❤️ 102.2K</span>
+                        <span title="Replies">💬 5.4K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038654268694224978" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038379773949562992" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -388,16 +385,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Elevators used to be manually operated and were especially risky if the operator was tired or inebriated.<br><br>Now, you just get in, press a button and a modern elevator, if inspected regularly, is extremely safe. <a href="https://t.co/wetvKfvJtH">https://t.co/wetvKfvJtH</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038379773949562992?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="zxx" dir="ltr"><a href="https://t.co/XrlqVeEVUT">pic.twitter.com/XrlqVeEVUT</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038531319496667561?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 7.7K</span>
-                        <span title="Likes">❤️ 101.7K</span>
-                        <span title="Replies">💬 5.4K</span>
+                        <span title="Retweets">🔁 8.6K</span>
+                        <span title="Likes">❤️ 93.8K</span>
+                        <span title="Replies">💬 6.7K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038379773949562992" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038531319496667561" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -406,16 +404,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="zxx" dir="ltr"><a href="https://t.co/XrlqVeEVUT">pic.twitter.com/XrlqVeEVUT</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038531319496667561?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">The mind of humanity <a href="https://t.co/835nX3DNii">https://t.co/835nX3DNii</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038478497296048212?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 8.5K</span>
-                        <span title="Likes">❤️ 92.4K</span>
-                        <span title="Replies">💬 6.6K</span>
+                        <span title="Retweets">🔁 8.0K</span>
+                        <span title="Likes">❤️ 97.8K</span>
+                        <span title="Replies">💬 3.8K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038531319496667561" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038478497296048212" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -424,16 +423,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">The mind of humanity <a href="https://t.co/835nX3DNii">https://t.co/835nX3DNii</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038478497296048212?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Delivering 119 satellites to orbit at once!<br><br>Falcon 9, which can carry ~20 tons to orbit (with a reusable booster &amp; fairing), is a “heavy” class rocket by conventional standards. <a href="https://t.co/dIUQslrLyD">https://t.co/dIUQslrLyD</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038334141566243252?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 8.0K</span>
-                        <span title="Likes">❤️ 96.9K</span>
-                        <span title="Replies">💬 3.8K</span>
+                        <span title="Retweets">🔁 11.2K</span>
+                        <span title="Likes">❤️ 76.8K</span>
+                        <span title="Replies">💬 4.8K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038478497296048212" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038334141566243252" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -442,16 +442,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Delivering 119 satellites to orbit at once!<br><br>Falcon 9, which can carry ~20 tons to orbit (with a reusable booster &amp; fairing), is a “heavy” class rocket by conventional standards. <a href="https://t.co/dIUQslrLyD">https://t.co/dIUQslrLyD</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038334141566243252?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Tesla is making a big investment in Japan with service &amp; Superchargers. <br><br>Many of the parts in Teslas are made in Japan. Panasonic has been our biggest strategic supplier over the past 2 decades. <a href="https://t.co/XkwdUIPeKy">https://t.co/XkwdUIPeKy</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038648039276257592?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 11.2K</span>
-                        <span title="Likes">❤️ 76.4K</span>
-                        <span title="Replies">💬 4.7K</span>
+                        <span title="Retweets">🔁 7.6K</span>
+                        <span title="Likes">❤️ 78.0K</span>
+                        <span title="Replies">💬 3.6K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038334141566243252" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038648039276257592" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -460,16 +461,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Tesla is making a big investment in Japan with service &amp; Superchargers. <br><br>Many of the parts in Teslas are made in Japan. Panasonic has been our biggest strategic supplier over the past 2 decades. <a href="https://t.co/XkwdUIPeKy">https://t.co/XkwdUIPeKy</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038648039276257592?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Only with Grok understanding every language and recommending content can this be done.<br><br>This has been a long-time goal. <a href="https://t.co/P8qqqbqd7l">https://t.co/P8qqqbqd7l</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038397888884355410?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 7.4K</span>
-                        <span title="Likes">❤️ 76.1K</span>
-                        <span title="Replies">💬 3.5K</span>
+                        <span title="Retweets">🔁 9.0K</span>
+                        <span title="Likes">❤️ 69.9K</span>
+                        <span title="Replies">💬 4.0K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038648039276257592" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038397888884355410" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -478,16 +480,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Only with Grok understanding every language and recommending content can this be done.<br><br>This has been a long-time goal. <a href="https://t.co/P8qqqbqd7l">https://t.co/P8qqqbqd7l</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038397888884355410?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Accurate 😂 <a href="https://t.co/pavI150ORs">https://t.co/pavI150ORs</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038372219131470111?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 8.9K</span>
-                        <span title="Likes">❤️ 69.6K</span>
-                        <span title="Replies">💬 4.0K</span>
+                        <span title="Retweets">🔁 6.9K</span>
+                        <span title="Likes">❤️ 67.9K</span>
+                        <span title="Replies">💬 2.1K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038397888884355410" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038372219131470111" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -496,16 +499,17 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Accurate 😂 <a href="https://t.co/pavI150ORs">https://t.co/pavI150ORs</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038372219131470111?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">34th launch &amp; landing of the same rocket <a href="https://t.co/OK4xGVFSs6">https://t.co/OK4xGVFSs6</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038747119453110746?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 6.8K</span>
-                        <span title="Likes">❤️ 67.6K</span>
-                        <span title="Replies">💬 2.1K</span>
+                        <span title="Retweets">🔁 4.8K</span>
+                        <span title="Likes">❤️ 49.1K</span>
+                        <span title="Replies">💬 3.1K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038372219131470111" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038747119453110746" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -514,13 +518,14 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
+                
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Grok gives great advice <a href="https://t.co/uouNm9lUO9">https://t.co/uouNm9lUO9</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038543165049991618?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
                         <span title="Retweets">🔁 4.0K</span>
-                        <span title="Likes">❤️ 41.4K</span>
+                        <span title="Likes">❤️ 41.8K</span>
                         <span title="Replies">💬 6.8K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038543165049991618" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -532,23 +537,6 @@
                     <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">34th launch &amp; landing of the same rocket <a href="https://t.co/OK4xGVFSs6">https://t.co/OK4xGVFSs6</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038747119453110746?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
-
-</div>
-                <div class="card-footer">
-                    <div class="stats-row">
-                        <span title="Retweets">🔁 4.3K</span>
-                        <span title="Likes">❤️ 43.3K</span>
-                        <span title="Replies">💬 2.9K</span>
-                    </div>
-                    <a href="https://x.com/elonmusk/status/2038747119453110746" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <span class="rank">#20</span>
-                    <span class="virality-badge">🔥 Viral</span>
-                </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Here you go <a href="https://t.co/TqtVljakd0">https://t.co/TqtVljakd0</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038532601569481205?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
@@ -556,15 +544,34 @@
                 <div class="card-footer">
                     <div class="stats-row">
                         <span title="Retweets">🔁 5.5K</span>
-                        <span title="Likes">❤️ 36.9K</span>
-                        <span title="Replies">💬 4.0K</span>
+                        <span title="Likes">❤️ 37.4K</span>
+                        <span title="Replies">💬 4.1K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038532601569481205" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="rank">#20</span>
+                    <span class="virality-badge">📈 Trending</span>
+                </div>
+                
+                
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Try Grok Imagine <a href="https://t.co/6fiizgKU76">https://t.co/6fiizgKU76</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038530285743260155?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+
+</div>
+                <div class="card-footer">
+                    <div class="stats-row">
+                        <span title="Retweets">🔁 3.6K</span>
+                        <span title="Likes">❤️ 27.1K</span>
+                        <span title="Replies">💬 3.1K</span>
+                    </div>
+                    <a href="https://x.com/elonmusk/status/2038530285743260155" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                </div>
+            </div>
 
 <footer>
-  Auto-updated daily at 7:00 AM UTC &bull; Powered by GitHub Actions<br>
+  Auto-updated daily at 7:00 AM UTC &bull; Powered by GitHub Actions + Claude AI<br>
   Add to Home Screen for app-like access on iPhone
 </footer>
 
