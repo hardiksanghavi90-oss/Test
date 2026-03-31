@@ -39,3 +39,15 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/
           git diff --staged --quiet || (git commit -m "Update Elon feed report - $(date -u +'%Y-%m-%d %H:%M UTC')" && git push)
+
+      - name: Send push notification
+        if: success()
+        run: |
+          POST_COUNT=$(python3 -c "import json; d=json.load(open('docs/posts.json')); print(len(d))")
+          curl -s \
+            -H "Title: Elon Feed Ready" \
+            -H "Click: https://hardiksanghavi90-oss.github.io/Test/" \
+            -H "Tags: chart_with_upwards_trend" \
+            -H "Priority: default" \
+            -d "${POST_COUNT} business insights from Elon Musk today. Tap to read." \
+            ntfy.sh/${{ secrets.NTFY_TOPIC }} || true
