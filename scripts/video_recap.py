@@ -118,25 +118,45 @@ def download_and_transcribe(video_id: str) -> str | None:
         audio_path = os.path.join(tmpdir, "audio")
 
         # Step 1: Download audio only with yt-dlp
-        print("  Downloading audio via yt-dlp...")
+        # Use iOS player client to bypass YouTube JS challenge
+        print("  Downloading audio via yt-dlp (iOS client)...")
         try:
             result = subprocess.run(
                 [
                     "yt-dlp",
                     "--extract-audio",
                     "--audio-format", "mp3",
-                    "--audio-quality", "5",  # lower quality = smaller file, fine for speech
+                    "--audio-quality", "5",
                     "--output", audio_path + ".%(ext)s",
                     "--no-playlist",
+                    "--extractor-args", "youtube:player_client=ios,web",
                     video_url,
                 ],
-                capture_output=True, text=True, timeout=120,
+                capture_output=True, text=True, timeout=180,
             )
             print(f"  yt-dlp exit code: {result.returncode}")
             if result.returncode != 0:
                 stderr = result.stderr[:500]
                 print(f"  yt-dlp stderr: {stderr}")
-                return None
+                # Try android client as fallback
+                print("  Retrying with android client...")
+                result = subprocess.run(
+                    [
+                        "yt-dlp",
+                        "--extract-audio",
+                        "--audio-format", "mp3",
+                        "--audio-quality", "5",
+                        "--output", audio_path + ".%(ext)s",
+                        "--no-playlist",
+                        "--extractor-args", "youtube:player_client=android,web",
+                        video_url,
+                    ],
+                    capture_output=True, text=True, timeout=180,
+                )
+                print(f"  yt-dlp retry exit code: {result.returncode}")
+                if result.returncode != 0:
+                    print(f"  yt-dlp retry stderr: {result.stderr[:500]}")
+                    return None
 
         except subprocess.TimeoutExpired:
             print("  yt-dlp timed out")
