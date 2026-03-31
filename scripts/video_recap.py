@@ -106,21 +106,68 @@ def parse_description_timestamps(description: str) -> list[dict]:
     return timestamps
 
 
-def transcribe_with_assemblyai(video_url: str) -> str | None:
-    """Transcribe a YouTube video using AssemblyAI."""
+PIPED_INSTANCES = [
+    "https://pipedapi.kavin.rocks",
+    "https://pipedapi.adminforge.de",
+    "https://pipedapi.in.projectsegfau.lt",
+]
+
+
+def get_audio_url(video_id: str) -> str | None:
+    """Get direct audio stream URL via Piped API (YouTube alternative frontend)."""
+    for instance in PIPED_INSTANCES:
+        try:
+            print(f"  Trying Piped instance: {instance}")
+            resp = requests.get(
+                f"{instance}/streams/{video_id}",
+                timeout=15,
+            )
+            if resp.status_code != 200:
+                print(f"    Status {resp.status_code}")
+                continue
+
+            data = resp.json()
+            audio_streams = data.get("audioStreams", [])
+            if not audio_streams:
+                print(f"    No audio streams found")
+                continue
+
+            # Pick the best quality audio stream
+            best = max(audio_streams, key=lambda s: s.get("bitrate", 0))
+            url = best.get("url")
+            if url:
+                print(f"    Got audio URL ({best.get('bitrate', '?')} bitrate, {best.get('mimeType', '?')})")
+                return url
+
+        except Exception as e:
+            print(f"    Error: {e}")
+            continue
+
+    print("  All Piped instances failed")
+    return None
+
+
+def transcribe_with_assemblyai(video_id: str) -> str | None:
+    """Transcribe a YouTube video: get audio URL via Piped, transcribe via AssemblyAI."""
     api_key = os.environ.get("ASSEMBLYAI_API_KEY")
     if not api_key:
         print("  ASSEMBLYAI_API_KEY not set — skipping transcription")
         return None
 
+    # Get direct audio URL via Piped
+    audio_url = get_audio_url(video_id)
+    if not audio_url:
+        print("  Could not get direct audio URL — skipping transcription")
+        return None
+
     headers = {"authorization": api_key, "content-type": "application/json"}
 
-    print(f"  Submitting to AssemblyAI: {video_url}")
+    print(f"  Submitting audio to AssemblyAI...")
     resp = requests.post(
         "https://api.assemblyai.com/v2/transcript",
         headers=headers,
         json={
-            "audio_url": video_url,
+            "audio_url": audio_url,
             "speech_models": ["universal-3-pro"],
         },
         timeout=30,
@@ -425,7 +472,7 @@ def process_video() -> tuple[str, str]:
 
     # Try AssemblyAI transcription (with correct speech model)
     print("Transcribing video with AssemblyAI...")
-    transcript = transcribe_with_assemblyai(video["url"])
+    transcript = transcribe_with_assemblyai(video["id"])
 
     # Parse description timestamps as fallback
     description = video.get("description", "")
