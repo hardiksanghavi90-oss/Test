@@ -32,6 +32,8 @@ jobs:
           TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          WHISPER_WORKER_URL: ${{ secrets.WHISPER_WORKER_URL }}
+          WORKER_AUTH_TOKEN: ${{ secrets.WORKER_AUTH_TOKEN }}
         run: PYTHONPATH=scripts python scripts/fetch_elon_posts.py
 
       - name: Commit and push report
