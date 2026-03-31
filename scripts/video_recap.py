@@ -121,7 +121,6 @@ def transcribe_with_assemblyai(video_url: str) -> str | None:
         headers=headers,
         json={
             "audio_url": video_url,
-            "speech_model": "best",
             "speech_models": ["universal-3-pro"],
         },
         timeout=30,
