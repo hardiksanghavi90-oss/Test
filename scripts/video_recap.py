@@ -75,26 +75,37 @@ def _search_via_rss() -> dict | None:
 
 def get_transcript(video_id: str) -> str | None:
     """Fetch YouTube auto-captions/transcript for a video."""
-    # Use the youtube-transcript-api or scrape captions
     try:
         from youtube_transcript_api import YouTubeTranscriptApi
 
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-        # Prefer manually created, fall back to auto-generated
-        transcript = None
-        try:
-            transcript = transcript_list.find_manually_created_transcript(["en"])
-        except Exception:
-            try:
-                transcript = transcript_list.find_generated_transcript(["en"])
-            except Exception:
-                pass
+        print(f"  Using youtube-transcript-api to fetch transcript...")
 
-        if not transcript:
-            print("No English transcript found")
+        # Try the newer API first (v1.x+)
+        try:
+            ytt_api = YouTubeTranscriptApi()
+            transcript_data = ytt_api.fetch(video_id, languages=["en"])
+            entries = []
+            for snippet in transcript_data:
+                entries.append({
+                    "start": snippet.start,
+                    "text": snippet.text,
+                })
+            print(f"  Got {len(entries)} transcript entries (new API)")
+        except (TypeError, AttributeError):
+            # Fall back to older API style (v0.x)
+            print("  Trying older API style...")
+            try:
+                entries_raw = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
+                entries = [{"start": e["start"], "text": e["text"]} for e in entries_raw]
+                print(f"  Got {len(entries)} transcript entries (old API)")
+            except Exception as e2:
+                print(f"  Old API also failed: {e2}")
+                return None
+
+        if not entries:
+            print("  Transcript is empty")
             return None
 
-        entries = transcript.fetch()
         # Format as timestamped text
         lines = []
         for entry in entries:
@@ -107,13 +118,15 @@ def get_transcript(video_id: str) -> str | None:
                 ts = f"{mins}:{secs:02d}"
             lines.append(f"[{ts}] {entry['text']}")
 
-        return "\n".join(lines)
+        result = "\n".join(lines)
+        print(f"  Transcript assembled: {len(result)} chars, {len(lines)} lines")
+        return result
 
-    except ImportError:
-        print("youtube-transcript-api not installed")
+    except ImportError as e:
+        print(f"  youtube-transcript-api not installed or import error: {e}")
         return None
     except Exception as e:
-        print(f"Transcript fetch error: {e}")
+        print(f"  Transcript fetch error: {type(e).__name__}: {e}")
         return None
 
 
