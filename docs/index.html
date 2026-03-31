@@ -173,91 +173,41 @@
     padding: 20px 0;
   }
 
-  .video-section {
-    margin-bottom: 24px;
-  }
-  .section-title {
-    font-size: 1.1em;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
+  .video-section { margin-bottom: 24px; }
+  .section-title { font-size: 1.1em; font-weight: 700; margin-bottom: 12px; }
   .video-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    padding: 16px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; padding: 16px;
   }
-  .video-embed {
-    margin-bottom: 12px;
-  }
-  .video-title {
-    font-size: 0.9em;
-    font-weight: 600;
-    margin-bottom: 12px;
-  }
+  .video-embed { margin-bottom: 12px; }
+  .video-title { font-size: 0.9em; font-weight: 600; margin-bottom: 12px; }
   .segments-label {
-    font-size: 0.75em;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 8px;
-    font-weight: 600;
+    font-size: 0.75em; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600;
   }
-  .segments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+  .segments-list { display: flex; flex-direction: column; gap: 6px; }
   .segment {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    background: var(--reply-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text);
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+    background: var(--reply-bg); border: 1px solid var(--border);
+    border-radius: 8px; text-decoration: none; color: var(--text);
   }
-  .segment:hover {
-    border-color: var(--accent);
-    background: var(--insight-bg);
-  }
+  .segment:hover { border-color: var(--accent); background: var(--insight-bg); }
   .seg-time {
-    font-family: monospace;
-    font-size: 0.85em;
-    color: var(--accent);
-    font-weight: 700;
-    min-width: 45px;
+    font-family: monospace; font-size: 0.85em; color: var(--accent);
+    font-weight: 700; min-width: 50px; text-align: center;
   }
-  .seg-content {
-    flex: 1;
+  .seg-end { font-size: 0.7em; color: var(--muted); font-weight: 400; }
+  .seg-content { flex: 1; }
+  .seg-topic { font-size: 0.85em; font-weight: 600; margin-bottom: 2px; }
+  .seg-company { font-size: 0.75em; color: var(--accent); font-weight: 400; }
+  .seg-summary { font-size: 0.78em; color: var(--muted); line-height: 1.4; }
+  .seg-evidence {
+    font-size: 0.72em; color: var(--muted); line-height: 1.3;
+    margin-top: 4px; font-style: italic; opacity: 0.7;
   }
-  .seg-topic {
-    font-size: 0.85em;
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-  .seg-company {
-    font-size: 0.75em;
-    color: var(--accent);
-    font-weight: 400;
-  }
-  .seg-summary {
-    font-size: 0.78em;
-    color: var(--muted);
-    line-height: 1.4;
-  }
-  .seg-play {
-    color: var(--accent);
-    font-size: 1.1em;
-  }
+  .seg-play { color: var(--accent); font-size: 1.1em; margin-top: 4px; }
   .no-segments {
-    color: var(--muted);
-    font-size: 0.85em;
-    padding: 12px;
-    text-align: center;
+    color: var(--muted); font-size: 0.85em; padding: 12px; text-align: center;
   }
 </style>
 </head>
@@ -269,7 +219,7 @@
 </header>
 
 <div class="info-bar">
-  <span>Updated: March 31, 2026 at 11:28 AM UTC</span>
+  <span>Updated: March 31, 2026 at 12:08 PM UTC</span>
   <span>6 posts (last 36h)</span>
 </div>
 
@@ -288,18 +238,20 @@
             <div class="segments-list">
                 
             <a href="https://www.youtube.com/watch?v=Dw3NnaSPiWY&t=244s" target="_blank" rel="noopener" class="segment">
-                <span class="seg-time">4:04</span>
+                <span class="seg-time">4:04<br><span class="seg-end">–6:04</span></span>
                 <div class="seg-content">
                     <div class="seg-topic">SpaceX (12 posts) <span class="seg-company"></span></div>
                     <div class="seg-summary">Section covering SpaceX (12 posts)</div>
+                    
                 </div>
                 <span class="seg-play">▶</span>
             </a>
             <a href="https://www.youtube.com/watch?v=Dw3NnaSPiWY&t=382s" target="_blank" rel="noopener" class="segment">
-                <span class="seg-time">6:22</span>
+                <span class="seg-time">6:22<br><span class="seg-end">–8:22</span></span>
                 <div class="seg-content">
                     <div class="seg-topic">AI (7 posts) <span class="seg-company"></span></div>
                     <div class="seg-summary">Section covering AI (7 posts)</div>
+                    
                 </div>
                 <span class="seg-play">▶</span>
             </a>
@@ -316,7 +268,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk reports that a Falcon 9 booster has completed its 34th flight, demonstrating SpaceX&#x27;s progress in rocket reusability and operational efficiency. This milestone illustrates a core business strategy of reducing launch costs through booster reuse, which is fundamental to SpaceX&#x27;s competitive advantage and path to profitability in commercial spaceflight.</p>
+                    <p>Elon Musk reports that a Falcon 9 booster has completed its 34th flight, demonstrating SpaceX&#x27;s progress toward reusable rocket technology and rapid relaunch cadence. This milestone illustrates the engineering achievement and cost efficiency gains from developing and operating reusable launch vehicles—a core strategy for SpaceX to reduce space access costs and increase launch frequency.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">34th flight of this booster <a href="https://t.co/sM4lQFTGA6">pic.twitter.com/sM4lQFTGA6</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038827523736506773?ref_src=twsrc%5Etfw">March 31, 2026</a></blockquote>
@@ -324,9 +276,9 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 9.0K</span>
-                        <span title="Likes">❤️ 132.5K</span>
-                        <span title="Replies">💬 6.0K</span>
+                        <span title="Retweets">🔁 9.5K</span>
+                        <span title="Likes">❤️ 139.5K</span>
+                        <span title="Replies">💬 6.1K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038827523736506773" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
@@ -339,7 +291,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk announces Tesla&#x27;s major investment expansion in Japan, focusing on service centers and Supercharger infrastructure while highlighting the strategic importance of Japanese suppliers, particularly Panasonic, which has been Tesla&#x27;s primary battery supplier for two decades. The post illustrates a key business lesson: maintaining and deepening relationships with critical supply chain partners—especially for core components like batteries—is essential for scaling manufacturing globally and ensuring long-term operational resilience.</p>
+                    <p>Tesla is expanding its operational footprint in Japan through increased investment in service centers and Supercharger infrastructure, while strengthening its supply chain dependency on Japanese manufacturers, particularly Panasonic, which has been a critical battery and component supplier for two decades. This reflects a key business strategy of geographic diversification and deepening strategic partnerships with proven suppliers to support manufacturing scale and market presence in key regions.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Tesla is making a big investment in Japan with service &amp; Superchargers. <br><br>Many of the parts in Teslas are made in Japan. Panasonic has been our biggest strategic supplier over the past 2 decades. <a href="https://t.co/XkwdUIPeKy">https://t.co/XkwdUIPeKy</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038648039276257592?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
@@ -347,8 +299,8 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 10.3K</span>
-                        <span title="Likes">❤️ 102.9K</span>
+                        <span title="Retweets">🔁 10.4K</span>
+                        <span title="Likes">❤️ 104.1K</span>
                         <span title="Replies">💬 4.1K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038648039276257592" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -362,7 +314,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk announces SpaceX&#x27;s 34th successful launch and landing of the same Falcon 9 rocket, demonstrating the company&#x27;s progress toward full rocket reusability—a core business objective for reducing launch costs and increasing flight cadence. This milestone directly reflects SpaceX&#x27;s engineering execution on manufacturing and operational scaling, two critical factors for the company&#x27;s profitability and its ability to serve Starlink deployment, satellite customers, and eventual Mars missions.</p>
+                    <p>Elon Musk announced SpaceX&#x27;s 34th successful launch and landing of the same Falcon 9 rocket, demonstrating the company&#x27;s progress toward rapid, cost-effective rocket reusability. This milestone directly reflects SpaceX&#x27;s core business strategy of achieving reliable rocket reuse to dramatically reduce launch costs and increase launch cadence, a critical engineering and operational achievement for the space transportation industry.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">34th launch &amp; landing of the same rocket <a href="https://t.co/OK4xGVFSs6">https://t.co/OK4xGVFSs6</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038747119453110746?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
@@ -370,8 +322,8 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 9.4K</span>
-                        <span title="Likes">❤️ 98.2K</span>
+                        <span title="Retweets">🔁 9.5K</span>
+                        <span title="Likes">❤️ 99.6K</span>
                         <span title="Replies">💬 4.4K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038747119453110746" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -385,7 +337,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk projects that SpaceX will achieve hourly launch cadence within 4-5 years, indicating aggressive scaling of Starship operations and manufacturing. This reflects SpaceX&#x27;s business strategy to dramatically increase launch frequency and reduce per-launch costs through reusability and operational optimization, a key metric for space industry competitiveness and revenue generation.</p>
+                    <p>Elon Musk projects that SpaceX will achieve unprecedented launch cadence, reaching one launch per hour within 4-5 years. This statement reflects SpaceX&#x27;s strategy to dramatically scale rocket reusability and manufacturing efficiency as core business drivers—a critical milestone for reducing launch costs, enabling rapid Starlink constellation deployment, and making space commerce economically viable at scale.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">In 4 or 5 years, there will be a launch every hour <a href="https://t.co/dipVNmkuQQ">https://t.co/dipVNmkuQQ</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038884240407019644?ref_src=twsrc%5Etfw">March 31, 2026</a></blockquote>
@@ -393,9 +345,9 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 4.3K</span>
-                        <span title="Likes">❤️ 40.1K</span>
-                        <span title="Replies">💬 4.2K</span>
+                        <span title="Retweets">🔁 4.8K</span>
+                        <span title="Likes">❤️ 45.0K</span>
+                        <span title="Replies">💬 4.4K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038884240407019644" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
@@ -403,12 +355,12 @@
             <div class="card">
                 <div class="card-header">
                     <span class="rank">#5</span>
-                    <span class="virality-badge">📈 Trending</span>
+                    <span class="virality-badge">🔥 Viral</span>
                 </div>
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk promotes Grok Imagine, xAI&#x27;s image generation capability within the Grok AI assistant. This represents a product feature launch for xAI&#x27;s competing AI platform, demonstrating the company&#x27;s expansion beyond text-based responses into multimodal AI capabilities to compete with other generative AI tools.</p>
+                    <p>Elon Musk promotes Grok Imagine, xAI&#x27;s image generation capability within the Grok AI assistant. This represents a product launch/feature expansion for xAI&#x27;s competitive AI offering, demonstrating the company&#x27;s development of multimodal AI capabilities to compete with other generative AI platforms like ChatGPT and Claude.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Try Grok Imagine <a href="https://t.co/6fiizgKU76">https://t.co/6fiizgKU76</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038530285743260155?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
@@ -416,8 +368,8 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 4.1K</span>
-                        <span title="Likes">❤️ 30.9K</span>
+                        <span title="Retweets">🔁 4.2K</span>
+                        <span title="Likes">❤️ 31.0K</span>
                         <span title="Replies">💬 3.3K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038530285743260155" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
@@ -431,7 +383,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk announces that Tesla vehicles are operational in underground transit tunnels beneath Las Vegas, transporting millions of passengers. This demonstrates Tesla&#x27;s expansion beyond consumer vehicles into infrastructure and transportation systems, showcasing the practical deployment of autonomous/semi-autonomous vehicles in controlled environments and Tesla&#x27;s ability to execute on the Boring Company&#x27;s tunnel vision for urban mobility solutions.</p>
+                    <p>Elon Musk highlights Tesla&#x27;s The Boring Company tunnel project in Las Vegas, which demonstrates a novel application of tunnel infrastructure for urban transportation at scale. This represents a real-world test of alternative transit solutions and showcases Tesla/Boring Company&#x27;s execution in deploying infrastructure technology, relevant to transportation innovation and business model diversification beyond traditional automotive manufacturing.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Teslas are in tunnels under Vegas transporting millions of people <a href="https://t.co/0Tc3pfrCTn">https://t.co/0Tc3pfrCTn</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038885159819473028?ref_src=twsrc%5Etfw">March 31, 2026</a></blockquote>
@@ -439,9 +391,9 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 2.7K</span>
-                        <span title="Likes">❤️ 30.6K</span>
-                        <span title="Replies">💬 1.7K</span>
+                        <span title="Retweets">🔁 3.1K</span>
+                        <span title="Likes">❤️ 35.7K</span>
+                        <span title="Replies">💬 1.9K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038885159819473028" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
