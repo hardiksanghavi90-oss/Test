@@ -2,7 +2,7 @@
 Fetch Elon Musk's posts from X.com, filter out politics/promos/low-effort,
 and generate a mobile-friendly HTML report with embedded tweet previews.
 
-Uses Twitter API v2 via tweepy.
+Uses Twitter API v2 via tweepy + Twitter oEmbed API for rich embeds.
 """
 
 import os
@@ -10,10 +10,12 @@ import sys
 import json
 import re
 import html as html_module
+import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import tweepy
+import requests
 
 
 # ---------------------------------------------------------------------------
@@ -57,10 +59,10 @@ PROMO_RE = re.compile("|".join(PROMO_KEYWORDS), re.IGNORECASE)
 URL_RE = re.compile(r"https?://\S+")
 EMOJI_RE = re.compile(
     "["
-    "\U0001F600-\U0001F64F"  # emoticons
-    "\U0001F300-\U0001F5FF"  # symbols & pictographs
-    "\U0001F680-\U0001F6FF"  # transport & map
-    "\U0001F1E0-\U0001F1FF"  # flags
+    "\U0001F600-\U0001F64F"
+    "\U0001F300-\U0001F5FF"
+    "\U0001F680-\U0001F6FF"
+    "\U0001F1E0-\U0001F1FF"
     "\U00002702-\U000027B0"
     "\U0001f900-\U0001f9FF"
     "\U0001FA00-\U0001FA6F"
@@ -79,7 +81,7 @@ EMOJI_RE = re.compile(
 
 def is_political(text: str) -> bool:
     matches = len(POLITICS_RE.findall(text))
-    return matches >= 2  # need 2+ signals to flag as political
+    return matches >= 2
 
 
 def is_promotional(text: str) -> bool:
@@ -131,6 +133,27 @@ def summarize(text: str, max_len: int = 200) -> str:
     return text[:max_len].rsplit(" ", 1)[0] + "..."
 
 
+def get_oembed(tweet_url: str, theme: str = "dark") -> str | None:
+    """Fetch Twitter oEmbed HTML for a tweet. Returns embed HTML or None."""
+    try:
+        resp = requests.get(
+            "https://publish.twitter.com/oembed",
+            params={
+                "url": tweet_url,
+                "theme": theme,
+                "dnt": "true",
+                "omit_script": "true",  # we load widgets.js once at the end
+                "maxwidth": 550,
+            },
+            timeout=10,
+        )
+        if resp.status_code == 200:
+            return resp.json().get("html")
+    except Exception as e:
+        print(f"  oEmbed failed for {tweet_url}: {e}")
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Fetch posts
 # ---------------------------------------------------------------------------
@@ -152,8 +175,6 @@ def fetch_posts():
 
     since = datetime.now(timezone.utc) - timedelta(hours=LOOKBACK_HOURS)
 
-    # Fetch tweets INCLUDING replies now (we want reply context)
-    # We use referenced_tweets to find what he's replying to
     tweets = client.get_users_tweets(
         id=user_id,
         max_results=MAX_RESULTS,
@@ -177,6 +198,7 @@ def fetch_posts():
         for t in tweets.includes.get("tweets", []):
             author = included_users.get(t.author_id, {})
             included_tweets[t.id] = {
+                "id": t.id,
                 "text": t.text,
                 "username": author.get("username", "unknown"),
                 "name": author.get("name", "Unknown"),
@@ -204,6 +226,7 @@ def fetch_posts():
                 if ref.type == "replied_to" and ref.id in included_tweets:
                     parent = included_tweets[ref.id]
                     parent_context = {
+                        "id": parent["id"],
                         "text": summarize(parent["text"], 200),
                         "username": parent["username"],
                         "name": parent["name"],
@@ -230,6 +253,21 @@ def fetch_posts():
     return posts[:20]  # top 20
 
 
+def fetch_embeds(posts: list) -> None:
+    """Fetch oEmbed HTML for each post and its parent (in-place)."""
+    for i, p in enumerate(posts):
+        print(f"  Fetching embed {i+1}/{len(posts)}: {p['url']}")
+        p["embed_html"] = get_oembed(p["url"])
+
+        if p.get("parent"):
+            print(f"    Fetching parent embed: {p['parent']['url']}")
+            p["parent"]["embed_html"] = get_oembed(p["parent"]["url"])
+
+        # Small delay to avoid rate limiting on oEmbed endpoint
+        if i < len(posts) - 1:
+            time.sleep(0.3)
+
+
 # ---------------------------------------------------------------------------
 # Generate HTML
 # ---------------------------------------------------------------------------
@@ -244,21 +282,41 @@ def generate_html(posts: list) -> str:
         for i, p in enumerate(posts, 1):
             summary_escaped = html_module.escape(p['summary'])
 
-            # Build parent context block if replying to someone
+            # Parent context: use oEmbed if available, else fallback to text
             parent_html = ""
             if p.get("parent"):
                 parent = p["parent"]
-                parent_text = html_module.escape(parent["text"])
-                parent_html = f"""
+                if parent.get("embed_html"):
+                    parent_html = f"""
                 <div class="reply-context">
-                    <div class="reply-label">Replying to @{html_module.escape(parent['username'])}</div>
-                    <a href="{parent['url']}" target="_blank" rel="noopener" class="parent-tweet">
+                    <div class="reply-label">↩ Replying to @{html_module.escape(parent['username'])}</div>
+                    <div class="parent-embed">{parent['embed_html']}</div>
+                </div>"""
+                else:
+                    parent_text = html_module.escape(parent["text"])
+                    parent_html = f"""
+                <div class="reply-context">
+                    <div class="reply-label">↩ Replying to @{html_module.escape(parent['username'])}</div>
+                    <a href="{parent['url']}" target="_blank" rel="noopener" class="parent-tweet-fallback">
                         <div class="parent-author">
                             <strong>{html_module.escape(parent['name'])}</strong>
                             <span class="parent-handle">@{html_module.escape(parent['username'])}</span>
                         </div>
                         <div class="parent-text">{parent_text}</div>
                     </a>
+                </div>"""
+
+            # Main tweet: use oEmbed if available, else fallback
+            if p.get("embed_html"):
+                tweet_html = f'<div class="tweet-embed">{p["embed_html"]}</div>'
+            else:
+                tweet_html = f"""
+                <div class="tweet-embed-fallback">
+                    <div class="tweet-author">
+                        <strong>Elon Musk</strong> <span class="tweet-handle">@elonmusk</span>
+                    </div>
+                    <div class="tweet-text">{summary_escaped}</div>
+                    <div class="tweet-date">{p['created_at']}</div>
                 </div>"""
 
             cards += f"""
@@ -268,13 +326,7 @@ def generate_html(posts: list) -> str:
                     <span class="virality-badge">{p['virality']}</span>
                 </div>
                 {parent_html}
-                <div class="tweet-embed">
-                    <blockquote class="twitter-tweet" data-theme="dark" data-dnt="true">
-                        <p>{summary_escaped}</p>
-                        &mdash; Elon Musk (@elonmusk)
-                        <a href="{p['url']}">{p['created_at']}</a>
-                    </blockquote>
-                </div>
+                {tweet_html}
                 <div class="card-footer">
                     <div class="stats-row">
                         <span title="Retweets">🔁 {format_number(p['retweets'])}</span>
@@ -373,10 +425,18 @@ def generate_html(posts: list) -> str:
   }}
   .reply-label {{
     color: var(--muted);
-    font-size: 0.75em;
+    font-size: 0.8em;
     margin-bottom: 6px;
+    font-weight: 600;
   }}
-  .parent-tweet {{
+  .parent-embed {{
+    border-radius: 10px;
+    overflow: hidden;
+  }}
+  .parent-embed .twitter-tweet {{
+    margin: 0 !important;
+  }}
+  .parent-tweet-fallback {{
     display: block;
     background: var(--reply-bg);
     border: 1px solid var(--border);
@@ -385,7 +445,7 @@ def generate_html(posts: list) -> str:
     text-decoration: none;
     color: var(--text);
   }}
-  .parent-tweet:hover {{
+  .parent-tweet-fallback:hover {{
     border-color: var(--accent);
   }}
   .parent-author {{
@@ -406,8 +466,30 @@ def generate_html(posts: list) -> str:
   .tweet-embed {{
     padding: 8px 16px;
   }}
-  .twitter-tweet {{
+  .tweet-embed .twitter-tweet {{
     margin: 0 !important;
+  }}
+
+  /* Fallback styling for when oEmbed fails */
+  .tweet-embed-fallback {{
+    padding: 12px 16px;
+  }}
+  .tweet-author {{
+    font-size: 0.85em;
+    margin-bottom: 6px;
+  }}
+  .tweet-handle {{
+    color: var(--muted);
+    margin-left: 4px;
+  }}
+  .tweet-text {{
+    font-size: 1em;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }}
+  .tweet-date {{
+    color: var(--muted);
+    font-size: 0.78em;
   }}
 
   /* Footer of each card */
@@ -450,7 +532,7 @@ def generate_html(posts: list) -> str:
 
 <header>
   <h1>Elon Musk - Substantive Posts</h1>
-  <div class="subtitle">Filtered: No politics, no promos, no low-effort &mdash; just real takes</div>
+  <div class="subtitle">Filtered: No politics, no promos &mdash; just real takes</div>
 </header>
 
 <div class="info-bar">
@@ -478,6 +560,9 @@ def main():
     print("Fetching Elon Musk's posts...")
     posts = fetch_posts()
     print(f"Found {len(posts)} substantive posts after filtering")
+
+    print("Fetching tweet embeds via oEmbed API...")
+    fetch_embeds(posts)
 
     html = generate_html(posts)
     out_dir = Path("docs")
