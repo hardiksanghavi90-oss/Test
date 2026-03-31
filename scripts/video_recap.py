@@ -120,7 +120,7 @@ def transcribe_with_assemblyai(video_url: str) -> str | None:
     resp = requests.post(
         "https://api.assemblyai.com/v2/transcript",
         headers=headers,
-        json={"audio_url": video_url, "speech_model": "best"},
+        json={"audio_url": video_url, "speech_models": ["best"]},
         timeout=30,
     )
     if resp.status_code != 200:
