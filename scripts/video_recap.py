@@ -106,176 +106,7 @@ def parse_description_timestamps(description: str) -> list[dict]:
     return timestamps
 
 
-def get_audio_url(video_id: str) -> str | None:
-    """Get direct audio stream URL using multiple methods."""
-    video_url = f"https://www.youtube.com/watch?v={video_id}"
-
-    # Method 1: Cobalt API
-    print("  Trying Cobalt API...")
-    try:
-        resp = requests.post(
-            "https://api.cobalt.tools/",
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-            },
-            json={"url": video_url, "audioFormat": "mp3", "isAudioOnly": True},
-            timeout=15,
-        )
-        if resp.status_code == 200:
-            data = resp.json()
-            url = data.get("url") or data.get("audio")
-            if url:
-                print(f"    Cobalt: got audio URL")
-                return url
-            print(f"    Cobalt response: {json.dumps(data)[:200]}")
-        else:
-            print(f"    Cobalt status: {resp.status_code}")
-    except Exception as e:
-        print(f"    Cobalt error: {e}")
-
-    # Method 2: Piped API (try multiple instances)
-    piped_instances = [
-        "https://pipedapi.kavin.rocks",
-        "https://pipedapi.r4fo.com",
-        "https://api.piped.yt",
-        "https://pipedapi.leptons.xyz",
-        "https://pipedapi.adminforge.de",
-    ]
-    for instance in piped_instances:
-        try:
-            print(f"  Trying Piped: {instance}")
-            resp = requests.get(f"{instance}/streams/{video_id}", timeout=10)
-            if resp.status_code != 200:
-                print(f"    Status {resp.status_code}")
-                continue
-            data = resp.json()
-            streams = data.get("audioStreams", [])
-            if not streams:
-                continue
-            best = max(streams, key=lambda s: s.get("bitrate", 0))
-            url = best.get("url")
-            if url:
-                print(f"    Got audio URL ({best.get('bitrate', '?')} bps)")
-                return url
-        except Exception as e:
-            print(f"    Error: {e}")
-            continue
-
-    # Method 3: Invidious API
-    invidious_instances = [
-        "https://inv.nadeko.net",
-        "https://invidious.fdn.fr",
-        "https://invidious.privacyredirect.com",
-    ]
-    for instance in invidious_instances:
-        try:
-            print(f"  Trying Invidious: {instance}")
-            resp = requests.get(f"{instance}/api/v1/videos/{video_id}", timeout=10)
-            if resp.status_code != 200:
-                continue
-            data = resp.json()
-            for fmt in data.get("adaptiveFormats", []):
-                if fmt.get("type", "").startswith("audio/"):
-                    url = fmt.get("url")
-                    if url:
-                        print(f"    Got audio URL via Invidious")
-                        return url
-        except Exception as e:
-            print(f"    Error: {e}")
-            continue
-
-    print("  All methods failed to get audio URL")
-    return None
-
-
-def transcribe_with_assemblyai(video_id: str) -> str | None:
-    """Transcribe a YouTube video: get audio URL via Piped, transcribe via AssemblyAI."""
-    api_key = os.environ.get("ASSEMBLYAI_API_KEY")
-    if not api_key:
-        print("  ASSEMBLYAI_API_KEY not set — skipping transcription")
-        return None
-
-    # Get direct audio URL via Piped
-    audio_url = get_audio_url(video_id)
-    if not audio_url:
-        print("  Could not get direct audio URL — skipping transcription")
-        return None
-
-    headers = {"authorization": api_key, "content-type": "application/json"}
-
-    print(f"  Submitting audio to AssemblyAI...")
-    resp = requests.post(
-        "https://api.assemblyai.com/v2/transcript",
-        headers=headers,
-        json={
-            "audio_url": audio_url,
-            "speech_models": ["universal-3-pro"],
-        },
-        timeout=30,
-    )
-    if resp.status_code not in (200, 201):
-        print(f"  AssemblyAI submit error: {resp.status_code} {resp.text[:300]}")
-        return None
-
-    transcript_id = resp.json().get("id")
-    print(f"  Transcription job started: {transcript_id}")
-
-    poll_url = f"https://api.assemblyai.com/v2/transcript/{transcript_id}"
-    for attempt in range(90):  # ~7.5 min max
-        time.sleep(5)
-        poll_resp = requests.get(poll_url, headers=headers, timeout=15)
-        data = poll_resp.json()
-        status = data.get("status")
-        if status == "completed":
-            print(f"  Transcription completed (attempt {attempt + 1})")
-            break
-        elif status == "error":
-            print(f"  Transcription failed: {data.get('error')}")
-            return None
-        elif attempt % 6 == 0:
-            print(f"  Status: {status} (waiting...)")
-    else:
-        print("  Transcription timed out")
-        return None
-
-    words = data.get("words", [])
-    if not words:
-        text = data.get("text", "")
-        if text:
-            print(f"  Got transcript ({len(text)} chars, no word timestamps)")
-            return text
-        return None
-
-    # Group words into ~10-second chunks
-    lines = []
-    chunk_words = []
-    chunk_start = 0
-    for word in words:
-        if not chunk_words:
-            chunk_start = word["start"]
-        chunk_words.append(word["text"])
-        if word["end"] - chunk_start >= 10000:
-            seconds = int(chunk_start / 1000)
-            mins, secs = divmod(seconds, 60)
-            hours, mins = divmod(mins, 60)
-            ts = f"{hours}:{mins:02d}:{secs:02d}" if hours else f"{mins}:{secs:02d}"
-            lines.append(f"[{ts}] {' '.join(chunk_words)}")
-            chunk_words = []
-    if chunk_words:
-        seconds = int(chunk_start / 1000)
-        mins, secs = divmod(seconds, 60)
-        hours, mins = divmod(mins, 60)
-        ts = f"{hours}:{mins:02d}:{secs:02d}" if hours else f"{mins}:{secs:02d}"
-        lines.append(f"[{ts}] {' '.join(chunk_words)}")
-
-    result = "\n".join(lines)
-    print(f"  Transcript assembled: {len(result)} chars, {len(lines)} lines")
-    return result
-
-
-def analyze_with_claude(video: dict, timestamps: list[dict],
-                        transcript: str | None = None) -> list[dict]:
+def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
     """Use Claude to classify which timestamps are business-relevant."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -284,10 +115,8 @@ def analyze_with_claude(video: dict, timestamps: list[dict],
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # Build context: prefer full transcript, fall back to description timestamps
-    if transcript:
-        context = f"Video: {video['title']}\n\nFULL TRANSCRIPT (with timestamps):\n{transcript[:14000]}"
-    elif timestamps:
+    # Build context from description timestamps
+    if timestamps:
         ts_text = "\n".join(
             f"- {t['timestamp']} {t['topic']}" for t in timestamps
         )
@@ -512,18 +341,14 @@ def process_video() -> tuple[str, str]:
     print(f"Found: {video['title']}")
     print(f"URL: {video['url']}")
 
-    # Try AssemblyAI transcription (with correct speech model)
-    print("Transcribing video with AssemblyAI...")
-    transcript = transcribe_with_assemblyai(video["id"])
-
-    # Parse description timestamps as fallback
+    # Parse description timestamps
     description = video.get("description", "")
     timestamps = parse_description_timestamps(description)
-    print(f"Found {len(timestamps)} timestamps in description (fallback)")
+    print(f"Found {len(timestamps)} timestamps in description")
 
-    # Analyze with Claude
+    # Classify with Claude, fall back to keyword matching
     print("Analyzing with Claude...")
-    segments = analyze_with_claude(video, timestamps, transcript=transcript)
+    segments = analyze_with_claude(video, timestamps)
     print(f"Final: {len(segments)} business-relevant segments")
 
     section_html = build_video_section(video, segments)
