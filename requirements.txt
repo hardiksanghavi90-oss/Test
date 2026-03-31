@@ -1,2 +1,4 @@
 tweepy>=4.14,<5
 anthropic>=0.40,<1
+yt-dlp>=2024.0
+faster-whisper>=1.0.0

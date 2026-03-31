@@ -106,165 +106,98 @@ def parse_description_timestamps(description: str) -> list[dict]:
     return timestamps
 
 
-def get_transcript_direct(video_id: str) -> str | None:
-    """Fetch YouTube captions by scraping the video page for caption track URLs.
-    This bypasses youtube-transcript-api and yt-dlp which get blocked from cloud IPs."""
+def download_and_transcribe(video_id: str) -> str | None:
+    """Download audio via yt-dlp and transcribe with faster-whisper."""
+    import subprocess
+    import tempfile
+    import glob
+
     video_url = f"https://www.youtube.com/watch?v={video_id}"
-    print(f"  Attempting direct caption scrape for {video_id}...")
 
-    try:
-        # Fetch the YouTube video page HTML
-        resp = requests.get(
-            video_url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept-Language": "en-US,en;q=0.9",
-            },
-            timeout=15,
-        )
-        if resp.status_code != 200:
-            print(f"  YouTube page returned {resp.status_code}")
-            return None
+    with tempfile.TemporaryDirectory() as tmpdir:
+        audio_path = os.path.join(tmpdir, "audio")
 
-        html_text = resp.text
-
-        # Extract the caption tracks from the page's ytInitialPlayerResponse
-        # Look for "captionTracks" in the JavaScript data
-        caption_match = re.search(r'"captionTracks"\s*:\s*(\[.*?\])', html_text)
-        if not caption_match:
-            print("  No captionTracks found in page HTML")
-            # Try alternate pattern
-            caption_match = re.search(r'"captions"\s*:\s*\{.*?"captionTracks"\s*:\s*(\[.*?\])', html_text, re.DOTALL)
-            if not caption_match:
-                print("  No captions data found at all")
+        # Step 1: Download audio only with yt-dlp
+        print("  Downloading audio via yt-dlp...")
+        try:
+            result = subprocess.run(
+                [
+                    "yt-dlp",
+                    "--extract-audio",
+                    "--audio-format", "mp3",
+                    "--audio-quality", "5",  # lower quality = smaller file, fine for speech
+                    "--output", audio_path + ".%(ext)s",
+                    "--no-playlist",
+                    video_url,
+                ],
+                capture_output=True, text=True, timeout=120,
+            )
+            print(f"  yt-dlp exit code: {result.returncode}")
+            if result.returncode != 0:
+                stderr = result.stderr[:500]
+                print(f"  yt-dlp stderr: {stderr}")
                 return None
 
-        import urllib.parse
+        except subprocess.TimeoutExpired:
+            print("  yt-dlp timed out")
+            return None
+        except FileNotFoundError:
+            print("  yt-dlp not found")
+            return None
 
-        tracks_json = caption_match.group(1)
-        # Fix any escaped characters
-        tracks_json = tracks_json.replace('\\"', '"').replace('\\/', '/')
+        # Find the downloaded audio file
+        audio_files = glob.glob(os.path.join(tmpdir, "audio.*"))
+        if not audio_files:
+            print("  No audio file downloaded")
+            return None
 
+        audio_file = audio_files[0]
+        file_size = os.path.getsize(audio_file)
+        print(f"  Audio downloaded: {audio_file} ({file_size / 1024 / 1024:.1f} MB)")
+
+        # Step 2: Transcribe with faster-whisper
+        print("  Transcribing with faster-whisper (base model)...")
         try:
-            tracks = json.loads(tracks_json)
-        except json.JSONDecodeError:
-            # Try to extract just the baseUrl
-            url_match = re.search(r'"baseUrl"\s*:\s*"(https://www\.youtube\.com/api/timedtext[^"]*)"', tracks_json)
-            if url_match:
-                tracks = [{"baseUrl": url_match.group(1).replace('\\u0026', '&'), "languageCode": "en"}]
+            from faster_whisper import WhisperModel
+
+            model = WhisperModel("base", device="cpu", compute_type="int8")
+            segments_iter, info = model.transcribe(
+                audio_file,
+                language="en",
+                beam_size=3,
+                vad_filter=True,  # skip silence
+            )
+            print(f"  Detected language: {info.language} (prob: {info.language_probability:.2f})")
+
+            lines = []
+            for segment in segments_iter:
+                seconds = int(segment.start)
+                text = segment.text.strip()
+                if not text:
+                    continue
+
+                mins, secs = divmod(seconds, 60)
+                hours, mins = divmod(mins, 60)
+                if hours:
+                    ts = f"{hours}:{mins:02d}:{secs:02d}"
+                else:
+                    ts = f"{mins}:{secs:02d}"
+                lines.append(f"[{ts}] {text}")
+
+            if lines:
+                transcript = "\n".join(lines)
+                print(f"  Transcription complete: {len(transcript)} chars, {len(lines)} segments")
+                return transcript
             else:
-                print("  Could not parse caption tracks JSON")
+                print("  Transcription produced no segments")
                 return None
 
-        print(f"  Found {len(tracks)} caption track(s)")
-
-        # Find English caption track
-        caption_url = None
-        for track in tracks:
-            lang = track.get("languageCode", "")
-            if lang.startswith("en"):
-                caption_url = track.get("baseUrl", "")
-                break
-
-        # If no English, try the first available with auto-translate
-        if not caption_url and tracks:
-            caption_url = tracks[0].get("baseUrl", "")
-            if caption_url and "en" not in tracks[0].get("languageCode", ""):
-                # Add translation parameter
-                caption_url += "&tlang=en"
-
-        if not caption_url:
-            print("  No suitable caption URL found")
+        except ImportError as e:
+            print(f"  faster-whisper not available: {e}")
             return None
-
-        # Fix URL encoding
-        caption_url = caption_url.replace('\\u0026', '&').replace('&amp;', '&')
-
-        # Request JSON3 format for easier parsing
-        if 'fmt=' not in caption_url:
-            caption_url += "&fmt=json3"
-        else:
-            caption_url = re.sub(r'fmt=\w+', 'fmt=json3', caption_url)
-
-        print(f"  Fetching captions from: {caption_url[:100]}...")
-
-        cap_resp = requests.get(
-            caption_url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            },
-            timeout=15,
-        )
-        if cap_resp.status_code != 200:
-            print(f"  Caption fetch returned {cap_resp.status_code}")
+        except Exception as e:
+            print(f"  Transcription error: {type(e).__name__}: {e}")
             return None
-
-        # Parse JSON3 format
-        try:
-            cap_data = cap_resp.json()
-        except json.JSONDecodeError:
-            # Maybe it returned XML instead, try parsing as XML
-            print("  Response isn't JSON, trying XML parse...")
-            return _parse_xml_captions(cap_resp.text)
-
-        events = cap_data.get("events", [])
-        lines = []
-        for event in events:
-            start_ms = event.get("tStartMs", 0)
-            seconds = int(start_ms / 1000)
-            segs = event.get("segs", [])
-            text = "".join(s.get("utf8", "") for s in segs).strip()
-            if not text or text == "\n":
-                continue
-
-            mins, secs = divmod(seconds, 60)
-            hours, mins = divmod(mins, 60)
-            if hours:
-                ts = f"{hours}:{mins:02d}:{secs:02d}"
-            else:
-                ts = f"{mins}:{secs:02d}"
-            lines.append(f"[{ts}] {text}")
-
-        if lines:
-            result = "\n".join(lines)
-            print(f"  Direct scrape transcript: {len(result)} chars, {len(lines)} lines")
-            return result
-
-        print("  No caption lines extracted from JSON3")
-        return None
-
-    except Exception as e:
-        print(f"  Direct caption scrape error: {type(e).__name__}: {e}")
-        return None
-
-
-def _parse_xml_captions(xml_text: str) -> str | None:
-    """Parse YouTube XML caption format as fallback."""
-    try:
-        lines = []
-        for match in re.finditer(r'<text start="([\d.]+)"[^>]*>(.*?)</text>', xml_text):
-            seconds = int(float(match.group(1)))
-            text = match.group(2).strip()
-            # Decode HTML entities
-            text = text.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>')
-            text = text.replace('&#39;', "'").replace('&quot;', '"')
-            if not text:
-                continue
-            mins, secs = divmod(seconds, 60)
-            hours, mins = divmod(mins, 60)
-            if hours:
-                ts = f"{hours}:{mins:02d}:{secs:02d}"
-            else:
-                ts = f"{mins}:{secs:02d}"
-            lines.append(f"[{ts}] {text}")
-
-        if lines:
-            result = "\n".join(lines)
-            print(f"  XML caption transcript: {len(result)} chars, {len(lines)} lines")
-            return result
-    except Exception as e:
-        print(f"  XML parse error: {e}")
-    return None
 
 
 def analyze_with_claude(video: dict, timestamps: list[dict],
@@ -480,9 +413,9 @@ def process_video() -> tuple[str, str]:
     print(f"Found: {video['title']}")
     print(f"URL: {video['url']}")
 
-    # Try to get the full transcript first (best source of detail)
-    print("Attempting to fetch full transcript...")
-    transcript = get_transcript_direct(video["id"])
+    # Download audio and transcribe with Whisper for full transcript
+    print("Downloading and transcribing video audio...")
+    transcript = download_and_transcribe(video["id"])
 
     # Also parse description timestamps as fallback
     description = video.get("description", "")
