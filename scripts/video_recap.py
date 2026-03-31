@@ -120,7 +120,7 @@ def transcribe_with_assemblyai(video_url: str) -> str | None:
     resp = requests.post(
         "https://api.assemblyai.com/v2/transcript",
         headers=headers,
-        json={"audio_url": video_url, "speech_models": ["best"]},
+        json={"audio_url": video_url},
         timeout=30,
     )
     if resp.status_code != 200:
@@ -257,7 +257,8 @@ Example: [{{"timestamp":"4:12","seconds":252,"topic":"Falcon Heavy dual booster 
         if json_match:
             segments = json.loads(json_match.group(0))
             print(f"  Claude identified {len(segments)} business-relevant segments")
-            return segments
+            if segments:
+                return segments
     except Exception as e:
         print(f"  Claude analysis error: {e}")
 
