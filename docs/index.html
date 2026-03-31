@@ -172,6 +172,93 @@
     font-size: 0.7em;
     padding: 20px 0;
   }
+
+  .video-section {
+    margin-bottom: 24px;
+  }
+  .section-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .video-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 16px;
+  }
+  .video-embed {
+    margin-bottom: 12px;
+  }
+  .video-title {
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .segments-label {
+    font-size: 0.75em;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .segments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .segment {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--reply-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .segment:hover {
+    border-color: var(--accent);
+    background: var(--insight-bg);
+  }
+  .seg-time {
+    font-family: monospace;
+    font-size: 0.85em;
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 45px;
+  }
+  .seg-content {
+    flex: 1;
+  }
+  .seg-topic {
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .seg-company {
+    font-size: 0.75em;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .seg-summary {
+    font-size: 0.78em;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .seg-play {
+    color: var(--accent);
+    font-size: 1.1em;
+  }
+  .no-segments {
+    color: var(--muted);
+    font-size: 0.85em;
+    padding: 12px;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -182,9 +269,27 @@
 </header>
 
 <div class="info-bar">
-  <span>Updated: March 31, 2026 at 01:52 AM UTC</span>
+  <span>Updated: March 31, 2026 at 08:15 AM UTC</span>
   <span>5 posts (last 36h)</span>
 </div>
+
+
+    <div class="video-section">
+        <h2 class="section-title">📺 Today's Video Recap</h2>
+        <div class="video-card">
+            <div class="video-embed">
+                <iframe src="https://www.youtube.com/embed/Dw3NnaSPiWY"
+                        frameborder="0" allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        style="width:100%;aspect-ratio:16/9;border-radius:8px;"></iframe>
+            </div>
+            <div class="video-title">Elon Musk posted 79 times on X today (03/30/26)</div>
+            <div class="segments-label">Business-Relevant Timestamps — tap to jump:</div>
+            <div class="segments-list">
+                <p class="no-segments">No business-relevant segments identified in today's video.</p>
+            </div>
+        </div>
+    </div>
 
 
             <div class="card">
@@ -195,7 +300,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk reports that Grok, xAI&#x27;s AI assistant integrated into X, is successfully implementing automatic translation and cross-language post recommendations—a feature that expands content discoverability across X&#x27;s global user base. This demonstrates progress on a key product capability that improves user engagement by breaking down language barriers, directly impacting X&#x27;s utility as a platform and Grok&#x27;s practical value proposition.</p>
+                    <p>Elon announces that Grok, xAI&#x27;s AI assistant integrated into 𝕏, is successfully implementing automatic translation and cross-language post recommendations as a core feature. This demonstrates progress on a key product capability that enhances platform engagement by breaking down language barriers and expanding content discoverability across 𝕏&#x27;s global user base.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Grok automatically translating and recommending 𝕏 posts from other languages is starting to work</p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038373467461190016?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
@@ -203,9 +308,9 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 17.7K</span>
-                        <span title="Likes">❤️ 245.1K</span>
-                        <span title="Replies">💬 11.2K</span>
+                        <span title="Retweets">🔁 19.2K</span>
+                        <span title="Likes">❤️ 261.9K</span>
+                        <span title="Replies">💬 11.7K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038373467461190016" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
@@ -218,19 +323,19 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon announces SpaceX&#x27;s Falcon 9 successfully deployed 119 satellites to orbit in a single launch, demonstrating the rocket&#x27;s significant payload capacity of ~20 tons with a reusable booster and fairing. This exemplifies SpaceX&#x27;s engineering achievement in rocket reusability and efficiency—key competitive advantages for reducing launch costs and increasing deployment frequency, directly supporting Starlink&#x27;s constellation expansion and commercial space operations.</p>
+                    <p>Elon Musk announces Tesla&#x27;s strategic investment in Japan focused on expanding service centers and Supercharger infrastructure, highlighting the company&#x27;s long-term dependency on Japanese suppliers—particularly Panasonic for battery components over the past two decades. The post illustrates a key business lesson: maintaining and deepening relationships with critical supply chain partners is essential for scaling manufacturing globally, and this requires localized infrastructure investments to support both operations and customer service in key supplier markets.</p>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Delivering 119 satellites to orbit at once!<br><br>Falcon 9, which can carry ~20 tons to orbit (with a reusable booster &amp; fairing), is a “heavy” class rocket by conventional standards. <a href="https://t.co/dIUQslrLyD">https://t.co/dIUQslrLyD</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038334141566243252?ref_src=twsrc%5Etfw">March 29, 2026</a></blockquote>
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Tesla is making a big investment in Japan with service &amp; Superchargers. <br><br>Many of the parts in Teslas are made in Japan. Panasonic has been our biggest strategic supplier over the past 2 decades. <a href="https://t.co/XkwdUIPeKy">https://t.co/XkwdUIPeKy</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038648039276257592?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 11.3K</span>
-                        <span title="Likes">❤️ 77.2K</span>
-                        <span title="Replies">💬 4.8K</span>
+                        <span title="Retweets">🔁 9.7K</span>
+                        <span title="Likes">❤️ 97.7K</span>
+                        <span title="Replies">💬 4.0K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038334141566243252" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038648039276257592" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -241,19 +346,19 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk announces Tesla&#x27;s significant capital investment in Japan to expand service centers and Supercharger networks, while highlighting the strategic importance of long-term supplier relationships—specifically with Panasonic, which has been Tesla&#x27;s primary battery and parts supplier for over two decades. This illustrates a key business lesson about supply chain resilience and the value of maintaining deep partnerships with specialized manufacturers in critical markets.</p>
+                    <p>Elon Musk reports that a SpaceX Falcon 9 booster has completed its 34th flight, demonstrating significant progress in rocket reusability and operational cadence. This milestone highlights SpaceX&#x27;s engineering achievement in designing rockets for multiple launches, directly supporting the company&#x27;s mission to reduce launch costs and increase frequency—core business objectives for both commercial spaceflight and Starlink deployment.</p>
                 </div>
                 
-                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Tesla is making a big investment in Japan with service &amp; Superchargers. <br><br>Many of the parts in Teslas are made in Japan. Panasonic has been our biggest strategic supplier over the past 2 decades. <a href="https://t.co/XkwdUIPeKy">https://t.co/XkwdUIPeKy</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038648039276257592?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
+                <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">34th flight of this booster <a href="https://t.co/sM4lQFTGA6">pic.twitter.com/sM4lQFTGA6</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038827523736506773?ref_src=twsrc%5Etfw">March 31, 2026</a></blockquote>
 
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 7.9K</span>
-                        <span title="Likes">❤️ 81.0K</span>
-                        <span title="Replies">💬 3.6K</span>
+                        <span title="Retweets">🔁 6.9K</span>
+                        <span title="Likes">❤️ 99.2K</span>
+                        <span title="Replies">💬 5.3K</span>
                     </div>
-                    <a href="https://x.com/elonmusk/status/2038648039276257592" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
+                    <a href="https://x.com/elonmusk/status/2038827523736506773" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
             </div>
             <div class="card">
@@ -264,7 +369,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk announces SpaceX&#x27;s 34th successful launch and landing of the same Falcon 9 rocket, demonstrating the company&#x27;s progress toward full rocket reusability. This milestone directly reflects SpaceX&#x27;s core business strategy of reducing launch costs through vehicle reusability, a critical competitive advantage in the commercial spaceflight market and essential for the company&#x27;s long-term profitability and ambitious goals like Starship development.</p>
+                    <p>Elon Musk announced SpaceX&#x27;s 34th successful launch and landing of the same Falcon 9 rocket, demonstrating the company&#x27;s achievement in rocket reusability. This milestone illustrates SpaceX&#x27;s core business model of reducing launch costs through rocket reusability, a critical competitive advantage in the commercial space industry and key to making space transportation economically viable for satellite deployment and cargo missions.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">34th launch &amp; landing of the same rocket <a href="https://t.co/OK4xGVFSs6">https://t.co/OK4xGVFSs6</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038747119453110746?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
@@ -272,9 +377,9 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 5.5K</span>
-                        <span title="Likes">❤️ 56.9K</span>
-                        <span title="Replies">💬 3.3K</span>
+                        <span title="Retweets">🔁 8.8K</span>
+                        <span title="Likes">❤️ 92.6K</span>
+                        <span title="Replies">💬 4.3K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038747119453110746" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
@@ -287,7 +392,7 @@
                 
                 <div class="ai-summary">
                     <div class="ai-label">💡 Business Insight</div>
-                    <p>Elon Musk promotes Grok Imagine, xAI&#x27;s image generation capability, by sharing a direct link for users to try the product. This represents a product launch/feature announcement for xAI&#x27;s Grok AI assistant, demonstrating the company&#x27;s expansion into multimodal AI capabilities beyond text generation and positioning Grok as a competitive alternative to other AI tools.</p>
+                    <p>Elon Musk promotes Grok Imagine, xAI&#x27;s image generation feature, by sharing a direct link for users to try the product. This represents a product launch/feature announcement for xAI&#x27;s Grok AI platform, demonstrating how founders can directly drive user adoption through organic social promotion of their technology offerings.</p>
                 </div>
                 
                 <div class="tweet-embed"><blockquote class="twitter-tweet" data-width="550" data-dnt="true" data-theme="dark"><p lang="en" dir="ltr">Try Grok Imagine <a href="https://t.co/6fiizgKU76">https://t.co/6fiizgKU76</a></p>&mdash; Elon Musk (@elonmusk) <a href="https://twitter.com/elonmusk/status/2038530285743260155?ref_src=twsrc%5Etfw">March 30, 2026</a></blockquote>
@@ -295,9 +400,9 @@
 </div>
                 <div class="card-footer">
                     <div class="stats-row">
-                        <span title="Retweets">🔁 3.7K</span>
-                        <span title="Likes">❤️ 27.5K</span>
-                        <span title="Replies">💬 3.1K</span>
+                        <span title="Retweets">🔁 4.1K</span>
+                        <span title="Likes">❤️ 30.6K</span>
+                        <span title="Replies">💬 3.2K</span>
                     </div>
                     <a href="https://x.com/elonmusk/status/2038530285743260155" target="_blank" rel="noopener" class="open-btn">Open on 𝕏 ↗</a>
                 </div>
