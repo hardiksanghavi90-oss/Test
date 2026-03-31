@@ -18,6 +18,7 @@ from pathlib import Path
 import tweepy
 import requests
 import anthropic
+from video_recap import process_video
 
 
 # ---------------------------------------------------------------------------
@@ -400,7 +401,7 @@ def fetch_embeds(posts: list) -> None:
 # Generate HTML
 # ---------------------------------------------------------------------------
 
-def generate_html(posts: list) -> str:
+def generate_html(posts: list, video_html: str = "", video_css: str = "") -> str:
     now = datetime.now(timezone.utc).strftime("%B %d, %Y at %I:%M %p UTC")
 
     if not posts:
@@ -650,6 +651,7 @@ def generate_html(posts: list) -> str:
     font-size: 0.7em;
     padding: 20px 0;
   }}
+{video_css}
 </style>
 </head>
 <body>
@@ -663,6 +665,8 @@ def generate_html(posts: list) -> str:
   <span>Updated: {now}</span>
   <span>{len(posts)} posts (last 36h)</span>
 </div>
+
+{video_html}
 
 {cards}
 
@@ -694,7 +698,10 @@ def main():
             print("Fetching tweet embeds via oEmbed API...")
             fetch_embeds(posts)
 
-    html = generate_html(posts)
+    print("\n--- Video Recap ---")
+    video_html, video_css = process_video()
+
+    html = generate_html(posts, video_html=video_html, video_css=video_css)
     out_dir = Path("docs")
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / "index.html"
