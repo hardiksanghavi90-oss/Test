@@ -1,6 +1,7 @@
 """
 Find the latest Jacob Hilton 'Elon Musk posted on X today' video,
-pull its transcript, and use Claude to identify business-relevant timestamps.
+get its description (via YouTube Data API), parse timestamps/chapters,
+and use Claude to identify business-relevant segments.
 """
 
 import os
@@ -15,24 +16,17 @@ import anthropic
 
 
 CHANNEL_NAME = "Jacob Hilton"
-# YouTube RSS feed for a channel (by channel ID)
-# We'll search for the channel and video via YouTube Data API
 SEARCH_QUERY = "Elon Musk posted on X today Jacob Hilton"
 
 
 def find_latest_video() -> dict | None:
     """Find the latest Jacob Hilton Elon recap video via YouTube Data API."""
     api_key = os.environ.get("YOUTUBE_API_KEY")
+    if not api_key:
+        print("  YOUTUBE_API_KEY not set — skipping video recap")
+        return None
 
-    if api_key:
-        return _search_via_api(api_key)
-    else:
-        print("YOUTUBE_API_KEY not set — trying RSS feed fallback")
-        return _search_via_rss()
-
-
-def _search_via_api(api_key: str) -> dict | None:
-    """Search YouTube API for the latest video."""
+    # Search for the latest video
     resp = requests.get(
         "https://www.googleapis.com/youtube/v3/search",
         params={
@@ -46,7 +40,7 @@ def _search_via_api(api_key: str) -> dict | None:
         timeout=15,
     )
     if resp.status_code != 200:
-        print(f"YouTube API error: {resp.status_code} {resp.text[:200]}")
+        print(f"  YouTube search API error: {resp.status_code} {resp.text[:200]}")
         return None
 
     items = resp.json().get("items", [])
@@ -54,194 +48,110 @@ def _search_via_api(api_key: str) -> dict | None:
         title = item["snippet"]["title"]
         if "elon" in title.lower() and ("posted" in title.lower() or "tweets" in title.lower()):
             video_id = item["id"]["videoId"]
+
+            # Fetch full video details (description with timestamps)
+            details = _get_video_details(video_id, api_key)
+            description = details.get("description", "") if details else ""
+
             return {
                 "id": video_id,
                 "title": title,
                 "url": f"https://www.youtube.com/watch?v={video_id}",
                 "channel": item["snippet"]["channelTitle"],
                 "published": item["snippet"]["publishedAt"][:10],
+                "description": description,
             }
-    print("No matching video found via API")
+
+    print("  No matching video found")
     return None
 
 
-def _search_via_rss() -> dict | None:
-    """Fallback: try to find the video via noembed or RSS."""
-    # Try a known recent pattern - search via Google
-    # This is a fallback and less reliable
-    print("RSS fallback not implemented — set YOUTUBE_API_KEY for reliable results")
+def _get_video_details(video_id: str, api_key: str) -> dict | None:
+    """Fetch full video details including description."""
+    resp = requests.get(
+        "https://www.googleapis.com/youtube/v3/videos",
+        params={
+            "part": "snippet",
+            "id": video_id,
+            "key": api_key,
+        },
+        timeout=15,
+    )
+    if resp.status_code == 200:
+        items = resp.json().get("items", [])
+        if items:
+            return items[0]["snippet"]
     return None
 
 
-def get_transcript(video_id: str) -> str | None:
-    """Fetch YouTube auto-captions using yt-dlp (works from cloud IPs)."""
-    import subprocess
-    import tempfile
+def parse_description_timestamps(description: str) -> list[dict]:
+    """Extract timestamps from video description (e.g. '2:15 - Grok update')."""
+    timestamps = []
+    # Match patterns like "0:00 - Topic" or "1:23:45 Topic" or "02:15 Topic"
+    pattern = re.compile(
+        r"(?:^|\n)\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[-–—:]?\s*(.+?)(?:\n|$)"
+    )
+    for match in pattern.finditer(description):
+        time_str = match.group(1)
+        topic = match.group(2).strip()
 
-    video_url = f"https://www.youtube.com/watch?v={video_id}"
-    print(f"  Downloading subtitles via yt-dlp for {video_id}...")
+        # Convert to seconds
+        parts = time_str.split(":")
+        if len(parts) == 3:
+            seconds = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
+        else:
+            seconds = int(parts[0]) * 60 + int(parts[1])
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        sub_path = os.path.join(tmpdir, "subs")
-        try:
-            result = subprocess.run(
-                [
-                    "yt-dlp",
-                    "--skip-download",
-                    "--write-auto-sub",
-                    "--sub-lang", "en",
-                    "--sub-format", "json3",
-                    "--output", sub_path,
-                    video_url,
-                ],
-                capture_output=True, text=True, timeout=60,
-            )
-            print(f"  yt-dlp exit code: {result.returncode}")
-            if result.returncode != 0:
-                print(f"  yt-dlp stderr: {result.stderr[:500]}")
+        timestamps.append({
+            "timestamp": time_str,
+            "seconds": seconds,
+            "topic": topic,
+        })
 
-            # Look for the subtitle file
-            sub_file = sub_path + ".en.json3"
-            if not os.path.exists(sub_file):
-                # Try alternate naming
-                import glob
-                candidates = glob.glob(os.path.join(tmpdir, "*.json3"))
-                if candidates:
-                    sub_file = candidates[0]
-                else:
-                    print(f"  No subtitle file found in {tmpdir}")
-                    # Try VTT format as fallback
-                    return _try_vtt_fallback(video_url, tmpdir, sub_path)
-
-            with open(sub_file, "r") as f:
-                data = json.load(f)
-
-            events = data.get("events", [])
-            lines = []
-            for event in events:
-                start_ms = event.get("tStartMs", 0)
-                seconds = int(start_ms / 1000)
-
-                # Build text from segments
-                segs = event.get("segs", [])
-                text = "".join(s.get("utf8", "") for s in segs).strip()
-                if not text or text == "\n":
-                    continue
-
-                mins, secs = divmod(seconds, 60)
-                hours, mins = divmod(mins, 60)
-                if hours:
-                    ts = f"{hours}:{mins:02d}:{secs:02d}"
-                else:
-                    ts = f"{mins}:{secs:02d}"
-                lines.append(f"[{ts}] {text}")
-
-            result_text = "\n".join(lines)
-            print(f"  Transcript assembled: {len(result_text)} chars, {len(lines)} lines")
-            return result_text if lines else None
-
-        except subprocess.TimeoutExpired:
-            print("  yt-dlp timed out after 60s")
-            return None
-        except Exception as e:
-            print(f"  Transcript fetch error: {type(e).__name__}: {e}")
-            return None
+    return timestamps
 
 
-def _try_vtt_fallback(video_url: str, tmpdir: str, sub_path: str) -> str | None:
-    """Try downloading VTT format as fallback."""
-    import subprocess
-    import glob
-
-    print("  Trying VTT format fallback...")
-    try:
-        subprocess.run(
-            [
-                "yt-dlp",
-                "--skip-download",
-                "--write-auto-sub",
-                "--sub-lang", "en",
-                "--sub-format", "vtt",
-                "--output", sub_path,
-                video_url,
-            ],
-            capture_output=True, text=True, timeout=60,
-        )
-        candidates = glob.glob(os.path.join(tmpdir, "*.vtt"))
-        if not candidates:
-            print("  No VTT file found either")
-            return None
-
-        with open(candidates[0], "r") as f:
-            vtt_text = f.read()
-
-        # Parse VTT: extract timestamps and text
-        lines = []
-        for match in re.finditer(
-            r"(\d{2}):(\d{2}):(\d{2})\.\d+\s*-->.*?\n(.+?)(?:\n\n|\Z)",
-            vtt_text, re.DOTALL
-        ):
-            h, m, s = int(match.group(1)), int(match.group(2)), int(match.group(3))
-            text = re.sub(r"<[^>]+>", "", match.group(4)).strip()
-            if not text:
-                continue
-            total_s = h * 3600 + m * 60 + s
-            mins, secs = divmod(total_s, 60)
-            hours, mins = divmod(mins, 60)
-            if hours:
-                ts = f"{hours}:{mins:02d}:{secs:02d}"
-            else:
-                ts = f"{mins}:{secs:02d}"
-            lines.append(f"[{ts}] {text}")
-
-        result_text = "\n".join(lines)
-        print(f"  VTT transcript: {len(result_text)} chars, {len(lines)} lines")
-        return result_text if lines else None
-
-    except Exception as e:
-        print(f"  VTT fallback error: {e}")
-        return None
-
-
-def analyze_transcript(transcript: str, video_url: str) -> list[dict]:
-    """Use Claude to identify business-relevant segments with timestamps."""
+def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
+    """Use Claude to classify which timestamps are business-relevant."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
-        print("ANTHROPIC_API_KEY not set — skipping transcript analysis")
-        return []
+        print("  ANTHROPIC_API_KEY not set — returning all timestamps")
+        return timestamps
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    prompt = f"""You are analyzing a transcript from a YouTube video that recaps Elon Musk's daily posts on X (Twitter).
+    # If we have description timestamps, use those
+    if timestamps:
+        ts_text = "\n".join(
+            f"- {t['timestamp']} {t['topic']}" for t in timestamps
+        )
+        context = f"Video: {video['title']}\n\nChapters/Timestamps from description:\n{ts_text}"
+    else:
+        # No timestamps — use the full description for Claude to analyze
+        context = f"Video: {video['title']}\n\nVideo description:\n{video.get('description', 'No description available')}"
 
-Your job: identify the segments that discuss BUSINESS-RELEVANT topics only.
+    prompt = f"""Analyze this YouTube video that recaps Elon Musk's daily X/Twitter posts.
 
-INCLUDE segments about:
-- Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, Boring Company, Optimus
-- AI/ML developments, model training, compute infrastructure
-- Engineering, manufacturing, production, rockets, launches
-- Business strategy, product decisions, scaling, growth
-- Leadership insights, hiring, company building
-- Energy, batteries, autonomous driving, robotics
+{context}
 
-EXCLUDE segments about:
-- Politics, government, elections, DOGE, regulations
-- Social commentary, culture war, morality quotes, identity politics
-- Memes, jokes, celebrity gossip, personal life
-- Generic motivational content not tied to business
+TASK: Identify segments that are about BUSINESS, TECH, or BUILDING topics.
 
-TRANSCRIPT:
-{transcript[:15000]}
+INCLUDE: Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, AI/ML, engineering,
+manufacturing, rockets, product strategy, scaling, leadership, energy, batteries,
+autonomous driving, robotics, company building.
 
-Return a JSON array of business-relevant segments. For each segment, provide:
-- "timestamp": the start time (e.g. "2:15")
-- "seconds": start time in total seconds (e.g. 135)
-- "topic": short topic label (e.g. "Grok Translation Feature")
-- "summary": 1-2 sentence business insight summary
-- "company": which company/product (e.g. "xAI/Grok", "SpaceX", "Tesla")
+EXCLUDE: Politics, social commentary, culture war, morality quotes, memes, jokes,
+personal life, celebrity gossip, government, DOGE, regulations.
 
-Return ONLY valid JSON array. If no business segments found, return [].
-Example: [{{"timestamp": "2:15", "seconds": 135, "topic": "Grok Translation", "summary": "Elon announces...", "company": "xAI"}}]"""
+For each relevant segment, provide:
+- "timestamp": start time (e.g. "2:15")
+- "seconds": total seconds (e.g. 135)
+- "topic": short topic label
+- "summary": 1 sentence business insight
+- "company": which company (e.g. "xAI", "SpaceX", "Tesla")
+
+Return ONLY a JSON array. If no business segments, return [].
+Example: [{{"timestamp":"2:15","seconds":135,"topic":"Grok Translation","summary":"Elon announces auto-translation feature for X posts.","company":"xAI"}}]"""
 
     try:
         message = client.messages.create(
@@ -250,18 +160,15 @@ Example: [{{"timestamp": "2:15", "seconds": 135, "topic": "Grok Translation", "s
             messages=[{"role": "user", "content": prompt}],
         )
         response_text = message.content[0].text.strip()
-
-        # Extract JSON array
         json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
         if json_match:
             segments = json.loads(json_match.group(0))
+            print(f"  Claude identified {len(segments)} business-relevant segments")
             return segments
-        else:
-            print("No JSON array found in Claude response")
-            return []
     except Exception as e:
-        print(f"Claude analysis error: {e}")
-        return []
+        print(f"  Claude analysis error: {e}")
+
+    return []
 
 
 def build_video_section(video: dict, segments: list[dict]) -> str:
@@ -277,10 +184,10 @@ def build_video_section(video: dict, segments: list[dict]) -> str:
         segment_html = ""
         for seg in segments:
             seconds = seg.get("seconds", 0)
-            ts = html_module.escape(seg.get("timestamp", "0:00"))
-            topic = html_module.escape(seg.get("topic", ""))
-            summary = html_module.escape(seg.get("summary", ""))
-            company = html_module.escape(seg.get("company", ""))
+            ts = html_module.escape(str(seg.get("timestamp", "0:00")))
+            topic = html_module.escape(str(seg.get("topic", "")))
+            summary = html_module.escape(str(seg.get("summary", "")))
+            company = html_module.escape(str(seg.get("company", "")))
             link = f"https://www.youtube.com/watch?v={video_id}&t={seconds}s"
 
             segment_html += f"""
@@ -404,8 +311,7 @@ def get_video_css() -> str:
 
 
 def process_video() -> tuple[str, str]:
-    """Main entry: find video, get transcript, analyze, return (html, css).
-    Returns empty strings if no video found."""
+    """Main entry: find video, parse timestamps, analyze, return (html, css)."""
 
     print("Looking for latest Jacob Hilton Elon recap video...")
     video = find_latest_video()
@@ -416,17 +322,22 @@ def process_video() -> tuple[str, str]:
     print(f"Found: {video['title']}")
     print(f"URL: {video['url']}")
 
-    print("Fetching transcript...")
-    transcript = get_transcript(video["id"])
-    if not transcript:
-        print("No transcript available — will show video without timestamps")
-        section_html = build_video_section(video, [])
-        return section_html, get_video_css()
+    # Try to parse timestamps from video description
+    description = video.get("description", "")
+    print(f"Description length: {len(description)} chars")
+    timestamps = parse_description_timestamps(description)
+    print(f"Found {len(timestamps)} timestamps in description")
 
-    print(f"Transcript length: {len(transcript)} chars")
-    print("Analyzing transcript for business-relevant segments...")
-    segments = analyze_transcript(transcript, video["url"])
-    print(f"Found {len(segments)} business-relevant segments")
+    if timestamps:
+        for ts in timestamps[:5]:
+            print(f"  {ts['timestamp']} - {ts['topic']}")
+        if len(timestamps) > 5:
+            print(f"  ... and {len(timestamps) - 5} more")
+
+    # Use Claude to classify which segments are business-relevant
+    print("Analyzing segments with Claude...")
+    segments = analyze_with_claude(video, timestamps)
+    print(f"Final: {len(segments)} business-relevant segments")
 
     section_html = build_video_section(video, segments)
     return section_html, get_video_css()
