@@ -2,7 +2,8 @@
 Fetch Elon Musk's posts from X.com, filter for business/building relevance,
 and generate a mobile-friendly HTML report with AI-powered summaries.
 
-Uses Twitter API v2 via tweepy, Claude API for summaries, Twitter oEmbed for embeds.
+Uses Twitter API v2 via tweepy, Claude API for classification + summaries,
+Twitter oEmbed for rich embeds.
 """
 
 import os
@@ -25,84 +26,9 @@ import anthropic
 ELON_USERNAME = "elonmusk"
 MAX_RESULTS = 100
 LOOKBACK_HOURS = 36
-MIN_TEXT_LENGTH = 15
+MAX_THREAD_DEPTH = 5  # how many levels up to walk in a reply chain
 
-# --- NEGATIVE filters: things to exclude ---
-
-POLITICS_KEYWORDS = [
-    r"\btrump\b", r"\bbiden\b", r"\bdemocrat", r"\brepublican",
-    r"\bmaga\b", r"\bgop\b", r"\bliberal\b", r"\bconservat",
-    r"\bimmigra", r"\bsocialist", r"\bmarxist", r"\bfascis",
-    r"\belection\b", r"\bvote\b", r"\bsenate\b", r"\bcongress\b",
-    r"\bwhite\s*house\b", r"\bdoge\b", r"\bgovernment\s*efficiency",
-    r"\bdeportation", r"\bborder\b", r"\bwoke\b", r"\bdei\b",
-    r"\bpolitical", r"\bparty\b", r"\bright[\s-]wing", r"\bleft[\s-]wing",
-    r"\bexecutive\s*order", r"\bregulation", r"\blobby",
-    r"\bgeopoliti", r"\bsanction", r"\btariff",
-    r"\bpresident\b", r"\bgovernor\b", r"\bpelosi\b", r"\baoc\b",
-    r"\bcongressman", r"\bcongresswoman", r"\bsenator\b",
-]
-
-SOCIAL_KEYWORDS = [
-    r"\bwoke\b", r"\bgender\b", r"\btrans\b", r"\blgbt",
-    r"\bpronoun", r"\bfeminis", r"\bpatriarch",
-    r"\bracis[mt]", r"\bwhite\s*supremac", r"\bblack\s*lives",
-    r"\bcancel\s*culture", r"\bcrt\b", r"\bcritical\s*race",
-    r"\bvaccin", r"\banti[\s-]?vax", r"\bcovid\s*hoax",
-    r"\bconspiracy", r"\bflat\s*earth",
-    r"\bimmigrant", r"\billegal\s*alien",
-    r"\bgun\s*control", r"\bsecond\s*amendment", r"\b2a\b",
-    r"\babortion", r"\bpro[\s-]?life", r"\bpro[\s-]?choice",
-    r"\breligion\b", r"\bchristian\b.*\bvalues",
-    r"\bmainstream\s*media", r"\bmsm\b", r"\bfake\s*news",
-    r"\bpropaganda\b", r"\bindoctrinat",
-    r"\bculture\s*war", r"\bvirtue\s*signal",
-]
-
-PROMO_KEYWORDS = [
-    r"\bbuy\s+now\b", r"\border\s+now\b", r"\bpre[\s-]?order\b",
-    r"\bavailable\s+now\b",
-    r"\bnew\s+feature\b", r"\bupdate\s+(is|now)\b",
-    r"\bsubscribe\b", r"\bx\s+premium\b",
-    r"\bdownload\b", r"\bapp\s+store\b",
-    r"\bcheck\s+(it\s+)?out\b",
-]
-
-POLITICS_RE = re.compile("|".join(POLITICS_KEYWORDS), re.IGNORECASE)
-SOCIAL_RE = re.compile("|".join(SOCIAL_KEYWORDS), re.IGNORECASE)
-PROMO_RE = re.compile("|".join(PROMO_KEYWORDS), re.IGNORECASE)
-
-# --- POSITIVE filter: business/building relevance ---
-
-BUSINESS_KEYWORDS = [
-    r"\btesla\b", r"\bspacex\b", r"\bstarship\b", r"\bfalcon",
-    r"\bstarlink\b", r"\bneuralink\b", r"\bboring\s*company",
-    r"\bxai\b", r"\bgrok\b", r"\boptimus\b",
-    r"\bengine", r"\brocket\b", r"\borbit", r"\bmars\b",
-    r"\bmanufactur", r"\bfactor[yi]", r"\bproduction\b",
-    r"\bscal(e|ing)\b", r"\bgrowth\b", r"\brevenue\b",
-    r"\bprofit\b", r"\bmargin\b", r"\bcost\b",
-    r"\binnovati", r"\bengineer", r"\bdesign\b",
-    r"\bai\b", r"\bartificial\s*intellig", r"\bmachine\s*learn",
-    r"\bneural\s*net", r"\bllm\b", r"\bmodel\b.*\btrain",
-    r"\bautonom", r"\bself[\s-]driv", r"\bfsd\b",
-    r"\bbatter[yi]", r"\benergy\b", r"\bsolar\b",
-    r"\bstartup", r"\bfound(er|ing)\b", r"\bcompan[yi]",
-    r"\bleadershi", r"\bmanage", r"\bhir(e|ing)\b",
-    r"\bstrateg", r"\bexecut(e|ion)\b",
-    r"\bship(ping|ped)?\b", r"\blaunch(ed|ing)?\b",
-    r"\bbuild(ing)?\b", r"\bcreate\b", r"\bsolv(e|ing)\b",
-    r"\boptimiz", r"\befficienc", r"\bautomati",
-    r"\bsoftware\b", r"\bhardware\b", r"\bchip\b",
-    r"\bsemiconduct", r"\bcompute\b", r"\bdata\s*center",
-    r"\bfirst\s*principles", r"\bphysics\b",
-    r"\bcapital\b", r"\binvest", r"\bfunding\b", r"\bipo\b",
-    r"\bvaluation\b", r"\bmarket\b",
-]
-
-BUSINESS_RE = re.compile("|".join(BUSINESS_KEYWORDS), re.IGNORECASE)
-
-# Regex to strip URLs and emoji for length check
+# Regex helpers
 URL_RE = re.compile(r"https?://\S+")
 EMOJI_RE = re.compile(
     "["
@@ -118,34 +44,7 @@ EMOJI_RE = re.compile(
 
 
 # ---------------------------------------------------------------------------
-# Filtering helpers
-# ---------------------------------------------------------------------------
-
-def is_political(text: str) -> bool:
-    return len(POLITICS_RE.findall(text)) >= 1
-
-
-def is_social_commentary(text: str) -> bool:
-    return len(SOCIAL_RE.findall(text)) >= 1
-
-
-def is_promotional(text: str) -> bool:
-    return len(PROMO_RE.findall(text)) >= 2
-
-
-def is_low_effort(text: str) -> bool:
-    stripped = URL_RE.sub("", text)
-    stripped = EMOJI_RE.sub("", stripped)
-    stripped = stripped.strip()
-    return len(stripped) < MIN_TEXT_LENGTH
-
-
-def has_business_signal(text: str) -> bool:
-    return len(BUSINESS_RE.findall(text)) >= 1
-
-
-# ---------------------------------------------------------------------------
-# Scoring & formatting helpers
+# Helpers
 # ---------------------------------------------------------------------------
 
 def engagement_score(metrics: dict) -> int:
@@ -174,7 +73,7 @@ def format_number(n: int) -> str:
     return str(n)
 
 
-def clean_text(text: str, max_len: int = 200) -> str:
+def clean_text(text: str, max_len: int = 300) -> str:
     text = URL_RE.sub("", text).strip()
     text = re.sub(r"\s+", " ", text)
     if len(text) <= max_len:
@@ -198,55 +97,188 @@ def get_oembed(tweet_url: str) -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# AI Summaries via Claude
+# Walk the reply chain to get full conversation context
 # ---------------------------------------------------------------------------
 
-def generate_summaries(posts: list) -> None:
-    """Use Claude Haiku to generate a business-insight summary for each post."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        print("ANTHROPIC_API_KEY not set — skipping AI summaries")
-        for p in posts:
-            p["ai_summary"] = None
-        return
+def walk_reply_chain(client: tweepy.Client, tweet, included_tweets: dict,
+                     included_users: dict) -> list[dict]:
+    """Walk up the reply chain to build conversation context.
+    Returns a list of dicts [{username, text, id}, ...] from root to parent."""
+    chain = []
+    current_refs = tweet.referenced_tweets
 
-    client = anthropic.Anthropic(api_key=api_key)
+    # First check the included_tweets from the initial API call
+    if current_refs:
+        for ref in current_refs:
+            if ref.type == "replied_to" and ref.id in included_tweets:
+                parent = included_tweets[ref.id]
+                chain.append(parent)
 
-    for i, p in enumerate(posts):
-        # Build context including parent tweet if available
-        context = f"Elon Musk posted: \"{p['text']}\""
-        if p.get("parent"):
-            context = (f"Someone (@{p['parent']['username']}) posted: "
-                       f"\"{p['parent']['text']}\"\n\n"
-                       f"Elon Musk replied: \"{p['text']}\"")
+    # If we found a parent in includes, try to walk further up via API
+    # Also if we didn't find the parent in includes, fetch it directly
+    if not chain and current_refs:
+        for ref in current_refs:
+            if ref.type == "replied_to":
+                try:
+                    result = client.get_tweet(
+                        ref.id,
+                        tweet_fields=["text", "author_id", "referenced_tweets"],
+                        expansions=["author_id"],
+                        user_fields=["username", "name"],
+                    )
+                    if result and result.data:
+                        author_info = {}
+                        if result.includes and result.includes.get("users"):
+                            u = result.includes["users"][0]
+                            author_info = {"username": u.username, "name": u.name}
+                        chain.append({
+                            "id": result.data.id,
+                            "text": result.data.text,
+                            "username": author_info.get("username", "unknown"),
+                            "name": author_info.get("name", "Unknown"),
+                            "_refs": result.data.referenced_tweets,
+                        })
+                except Exception as e:
+                    print(f"    Chain fetch failed for {ref.id}: {e}")
+                break
 
-        prompt = f"""Analyze this post from Elon Musk and write a 2-3 sentence summary aimed at entrepreneurs and business operators.
+    # Continue walking up from the last parent we found
+    for depth in range(1, MAX_THREAD_DEPTH):
+        if not chain:
+            break
+        last = chain[-1]
+        refs = last.get("_refs")
+        if not refs:
+            break
 
-{context}
-
-Your summary should:
-1. Explain WHAT Elon is saying (provide context if it's a reply or cryptic)
-2. Extract the business insight, strategy, or lesson for entrepreneurs
-3. If relevant, mention which company/product it relates to (Tesla, SpaceX, xAI, etc.)
-
-If the post has no meaningful business insight (it's just a joke, meme, or casual comment), say so briefly and note any context.
-
-Write in a direct, concise style. No fluff. Start directly with the insight."""
+        parent_ref = None
+        for ref in refs:
+            if ref.type == "replied_to":
+                parent_ref = ref
+                break
+        if not parent_ref:
+            break
 
         try:
-            message = client.messages.create(
+            result = client.get_tweet(
+                parent_ref.id,
+                tweet_fields=["text", "author_id", "referenced_tweets"],
+                expansions=["author_id"],
+                user_fields=["username", "name"],
+            )
+            if result and result.data:
+                author_info = {}
+                if result.includes and result.includes.get("users"):
+                    u = result.includes["users"][0]
+                    author_info = {"username": u.username, "name": u.name}
+                chain.append({
+                    "id": result.data.id,
+                    "text": result.data.text,
+                    "username": author_info.get("username", "unknown"),
+                    "name": author_info.get("name", "Unknown"),
+                    "_refs": result.data.referenced_tweets,
+                })
+            else:
+                break
+        except Exception as e:
+            print(f"    Chain fetch failed at depth {depth}: {e}")
+            break
+
+    # Reverse so it goes from root → ... → parent (chronological order)
+    chain.reverse()
+
+    # Clean up internal fields and build display text
+    for item in chain:
+        item.pop("_refs", None)
+        if "url" not in item:
+            item["url"] = f"https://x.com/{item.get('username', 'unknown')}/status/{item['id']}"
+
+    return chain
+
+
+# ---------------------------------------------------------------------------
+# Claude AI: Classify + Summarize
+# ---------------------------------------------------------------------------
+
+def classify_and_summarize(posts: list) -> list:
+    """Use Claude to classify relevance and generate summaries.
+    Returns only the business-relevant posts with summaries attached."""
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        print("ANTHROPIC_API_KEY not set — skipping AI classification/summaries")
+        for p in posts:
+            p["ai_summary"] = None
+            p["is_relevant"] = True  # can't filter without AI, keep all
+        return posts
+
+    ai_client = anthropic.Anthropic(api_key=api_key)
+    relevant_posts = []
+
+    for i, p in enumerate(posts):
+        # Build full thread context
+        thread_text = ""
+        if p.get("thread_chain"):
+            for j, msg in enumerate(p["thread_chain"]):
+                thread_text += f"[{j+1}] @{msg['username']}: \"{msg['text']}\"\n"
+            thread_text += f"[Reply] @elonmusk: \"{p['text']}\""
+        else:
+            thread_text = f"@elonmusk: \"{p['text']}\""
+
+        prompt = f"""You are analyzing an Elon Musk post (and its full conversation thread) for a daily business insights digest aimed at entrepreneurs and operators.
+
+FULL CONVERSATION THREAD:
+{thread_text}
+
+TASK: First classify, then summarize.
+
+1. CLASSIFY: Is this post relevant to business, entrepreneurship, technology, engineering, product strategy, leadership, company building, AI/ML, space, energy, manufacturing, or similar topics that would help an entrepreneur or operator?
+   - NOT relevant: politics, social commentary, culture war, memes with no business angle, personal jokes, motivational quotes about life/justice/morality, partisan opinions, celebrity gossip
+   - IS relevant: insights on building companies, product decisions, engineering challenges, AI developments, market strategy, leadership philosophy applied to business, manufacturing insights, space/tech milestones
+
+2. If RELEVANT, write a 2-3 sentence business insight summary that:
+   - Explains the full context (what the thread is about, not just Elon's reply)
+   - Extracts the actionable business insight or lesson
+   - Mentions which company/product if applicable (Tesla, SpaceX, xAI, Grok, Starlink, etc.)
+
+Respond in this exact JSON format:
+{{"relevant": true/false, "summary": "your summary here or null if not relevant"}}
+
+Return ONLY the JSON, nothing else."""
+
+        try:
+            message = ai_client.messages.create(
                 model="claude-haiku-4-5-20251001",
-                max_tokens=200,
+                max_tokens=300,
                 messages=[{"role": "user", "content": prompt}],
             )
-            p["ai_summary"] = message.content[0].text.strip()
-            print(f"  Summary {i+1}/{len(posts)}: OK")
+            response_text = message.content[0].text.strip()
+
+            # Parse JSON response
+            # Handle potential markdown wrapping
+            if response_text.startswith("```"):
+                response_text = re.sub(r"^```json?\s*", "", response_text)
+                response_text = re.sub(r"\s*```$", "", response_text)
+
+            result = json.loads(response_text)
+
+            if result.get("relevant"):
+                p["ai_summary"] = result.get("summary")
+                p["is_relevant"] = True
+                relevant_posts.append(p)
+                print(f"  Post {i+1}/{len(posts)}: RELEVANT ✓")
+            else:
+                print(f"  Post {i+1}/{len(posts)}: filtered out (not business)")
+
         except Exception as e:
-            print(f"  Summary {i+1}/{len(posts)}: FAILED - {e}")
+            print(f"  Post {i+1}/{len(posts)}: FAILED ({e}) — keeping post")
             p["ai_summary"] = None
+            p["is_relevant"] = True
+            relevant_posts.append(p)
 
         if i < len(posts) - 1:
             time.sleep(0.2)
+
+    return relevant_posts
 
 
 # ---------------------------------------------------------------------------
@@ -295,6 +327,7 @@ def fetch_posts():
                 "id": t.id, "text": t.text,
                 "username": author.get("username", "unknown"),
                 "name": author.get("name", "Unknown"),
+                "_refs": t.referenced_tweets,
             }
 
     posts = []
@@ -303,39 +336,21 @@ def fetch_posts():
         metrics = tweet.public_metrics or {}
         score = engagement_score(metrics)
 
-        # Hard filters: always exclude politics and social commentary
-        # Check both the tweet AND parent context for political content
-        parent_text = ""
+        # Walk the reply chain to get full context
+        print(f"  Walking thread for tweet {tweet.id}...")
+        thread_chain = walk_reply_chain(client, tweet, included_tweets, included_users)
+
+        # Get the immediate parent for display purposes
         parent_context = None
-        if tweet.referenced_tweets:
-            for ref in tweet.referenced_tweets:
-                if ref.type == "replied_to" and ref.id in included_tweets:
-                    parent = included_tweets[ref.id]
-                    parent_text = parent.get("text", "")
-                    parent_context = {
-                        "id": parent["id"],
-                        "text": clean_text(parent["text"], 300),
-                        "username": parent["username"],
-                        "name": parent["name"],
-                        "url": f"https://x.com/{parent['username']}/status/{ref.id}",
-                    }
-                    break
-
-        combined_text = text + " " + parent_text
-        if is_political(combined_text):
-            continue
-        if is_social_commentary(combined_text):
-            continue
-        if is_promotional(text):
-            continue
-
-        # Low-effort posts: keep only if viral
-        if is_low_effort(text) and score < 50_000:
-            continue
-
-        # Prefer posts with business relevance; allow high-viral through
-        if not has_business_signal(combined_text) and score < 50_000:
-            continue
+        if thread_chain:
+            parent = thread_chain[-1]  # most recent parent
+            parent_context = {
+                "id": parent["id"],
+                "text": clean_text(parent["text"], 300),
+                "username": parent["username"],
+                "name": parent.get("name", parent["username"]),
+                "url": parent.get("url", f"https://x.com/{parent['username']}/status/{parent['id']}"),
+            }
 
         posts.append({
             "id": tweet.id,
@@ -350,10 +365,12 @@ def fetch_posts():
             "score": score,
             "virality": virality_label(score),
             "parent": parent_context,
+            "thread_chain": thread_chain,  # full chain for Claude
         })
 
+    # Sort by engagement
     posts.sort(key=lambda p: p["score"], reverse=True)
-    return posts[:20]
+    return posts[:30]  # fetch top 30, Claude will filter down
 
 
 def fetch_embeds(posts: list) -> None:
@@ -408,7 +425,7 @@ def generate_html(posts: list) -> str:
                     <div class="reply-label">↩ Replying to @{html_module.escape(parent['username'])}</div>
                     <a href="{parent['url']}" target="_blank" rel="noopener" class="parent-tweet-fallback">
                         <div class="parent-author">
-                            <strong>{html_module.escape(parent['name'])}</strong>
+                            <strong>{html_module.escape(parent.get('name', parent['username']))}</strong>
                             <span class="parent-handle">@{html_module.escape(parent['username'])}</span>
                         </div>
                         <div class="parent-text">{parent_text}</div>
@@ -530,7 +547,6 @@ def generate_html(posts: list) -> str:
     white-space: nowrap;
   }}
 
-  /* AI Summary */
   .ai-summary {{
     margin: 10px 16px 0;
     background: var(--insight-bg);
@@ -552,7 +568,6 @@ def generate_html(posts: list) -> str:
     color: var(--text);
   }}
 
-  /* Reply context */
   .reply-context {{
     margin: 10px 16px 0;
   }}
@@ -629,12 +644,12 @@ def generate_html(posts: list) -> str:
 
 <header>
   <h1>Elon Musk - Business Insights</h1>
-  <div class="subtitle">Filtered for business, building & strategy &mdash; no politics, no social commentary</div>
+  <div class="subtitle">AI-curated: only business, tech & building insights &mdash; no politics, no social commentary</div>
 </header>
 
 <div class="info-bar">
   <span>Updated: {now}</span>
-  <span>Top {len(posts)} posts (last 36h)</span>
+  <span>{len(posts)} posts (last 36h)</span>
 </div>
 
 {cards}
@@ -656,14 +671,16 @@ def generate_html(posts: list) -> str:
 def main():
     print("Fetching Elon Musk's posts...")
     posts = fetch_posts()
-    print(f"Found {len(posts)} business-relevant posts after filtering")
+    print(f"Found {len(posts)} posts before AI filtering")
 
     if posts:
-        print("Generating AI summaries via Claude...")
-        generate_summaries(posts)
+        print("Classifying relevance + generating summaries via Claude...")
+        posts = classify_and_summarize(posts)
+        print(f"Kept {len(posts)} business-relevant posts after AI filtering")
 
-        print("Fetching tweet embeds via oEmbed API...")
-        fetch_embeds(posts)
+        if posts:
+            print("Fetching tweet embeds via oEmbed API...")
+            fetch_embeds(posts)
 
     html = generate_html(posts)
     out_dir = Path("docs")
@@ -672,6 +689,9 @@ def main():
     out_path.write_text(html, encoding="utf-8")
     print(f"Report written to {out_path}")
 
+    # Save JSON (strip thread_chain to keep it clean)
+    for p in posts:
+        p.pop("thread_chain", None)
     json_path = out_dir / "posts.json"
     json_path.write_text(json.dumps(posts, indent=2, default=str), encoding="utf-8")
     print(f"JSON data written to {json_path}")
