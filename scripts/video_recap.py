@@ -106,44 +106,86 @@ def parse_description_timestamps(description: str) -> list[dict]:
     return timestamps
 
 
-PIPED_INSTANCES = [
-    "https://pipedapi.kavin.rocks",
-    "https://pipedapi.adminforge.de",
-    "https://pipedapi.in.projectsegfau.lt",
-]
-
-
 def get_audio_url(video_id: str) -> str | None:
-    """Get direct audio stream URL via Piped API (YouTube alternative frontend)."""
-    for instance in PIPED_INSTANCES:
+    """Get direct audio stream URL using multiple methods."""
+    video_url = f"https://www.youtube.com/watch?v={video_id}"
+
+    # Method 1: Cobalt API
+    print("  Trying Cobalt API...")
+    try:
+        resp = requests.post(
+            "https://api.cobalt.tools/",
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+            json={"url": video_url, "audioFormat": "mp3", "isAudioOnly": True},
+            timeout=15,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            url = data.get("url") or data.get("audio")
+            if url:
+                print(f"    Cobalt: got audio URL")
+                return url
+            print(f"    Cobalt response: {json.dumps(data)[:200]}")
+        else:
+            print(f"    Cobalt status: {resp.status_code}")
+    except Exception as e:
+        print(f"    Cobalt error: {e}")
+
+    # Method 2: Piped API (try multiple instances)
+    piped_instances = [
+        "https://pipedapi.kavin.rocks",
+        "https://pipedapi.r4fo.com",
+        "https://api.piped.yt",
+        "https://pipedapi.leptons.xyz",
+        "https://pipedapi.adminforge.de",
+    ]
+    for instance in piped_instances:
         try:
-            print(f"  Trying Piped instance: {instance}")
-            resp = requests.get(
-                f"{instance}/streams/{video_id}",
-                timeout=15,
-            )
+            print(f"  Trying Piped: {instance}")
+            resp = requests.get(f"{instance}/streams/{video_id}", timeout=10)
             if resp.status_code != 200:
                 print(f"    Status {resp.status_code}")
                 continue
-
             data = resp.json()
-            audio_streams = data.get("audioStreams", [])
-            if not audio_streams:
-                print(f"    No audio streams found")
+            streams = data.get("audioStreams", [])
+            if not streams:
                 continue
-
-            # Pick the best quality audio stream
-            best = max(audio_streams, key=lambda s: s.get("bitrate", 0))
+            best = max(streams, key=lambda s: s.get("bitrate", 0))
             url = best.get("url")
             if url:
-                print(f"    Got audio URL ({best.get('bitrate', '?')} bitrate, {best.get('mimeType', '?')})")
+                print(f"    Got audio URL ({best.get('bitrate', '?')} bps)")
                 return url
-
         except Exception as e:
             print(f"    Error: {e}")
             continue
 
-    print("  All Piped instances failed")
+    # Method 3: Invidious API
+    invidious_instances = [
+        "https://inv.nadeko.net",
+        "https://invidious.fdn.fr",
+        "https://invidious.privacyredirect.com",
+    ]
+    for instance in invidious_instances:
+        try:
+            print(f"  Trying Invidious: {instance}")
+            resp = requests.get(f"{instance}/api/v1/videos/{video_id}", timeout=10)
+            if resp.status_code != 200:
+                continue
+            data = resp.json()
+            for fmt in data.get("adaptiveFormats", []):
+                if fmt.get("type", "").startswith("audio/"):
+                    url = fmt.get("url")
+                    if url:
+                        print(f"    Got audio URL via Invidious")
+                        return url
+        except Exception as e:
+            print(f"    Error: {e}")
+            continue
+
+    print("  All methods failed to get audio URL")
     return None
 
 
