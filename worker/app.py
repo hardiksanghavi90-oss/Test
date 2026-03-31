@@ -58,6 +58,7 @@ def download_audio(video_id: str) -> tuple[str | None, str]:
     """Download audio from YouTube using yt-dlp with proxy support.
     Returns (audio_path, error_detail)."""
     import subprocess
+    import signal
 
     url = f"https://www.youtube.com/watch?v={video_id}"
     tmpdir = tempfile.mkdtemp()
@@ -65,6 +66,19 @@ def download_audio(video_id: str) -> tuple[str | None, str]:
 
     proxy = os.environ.get("PROXY_URL", "")
     last_error = ""
+
+    # Start the bgutil POT server (needed for YouTube challenge solving)
+    pot_server = None
+    try:
+        pot_server = subprocess.Popen(
+            ["python", "-m", "bgutil_ytdlp_pot_provider", "serve"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        import time
+        time.sleep(2)  # give it time to start
+        app.logger.info("bgutil POT server started")
+    except Exception as e:
+        app.logger.warning(f"Could not start POT server: {e}")
 
     # Build base command
     base_cmd = [
@@ -80,23 +94,32 @@ def download_audio(video_id: str) -> tuple[str | None, str]:
         base_cmd += ["--proxy", proxy]
 
     # Try multiple player clients
-    for client in ["ios,web", "android,web", "web"]:
-        cmd = base_cmd + ["--extractor-args", f"youtube:player_client={client}", url]
-        app.logger.info(f"Trying client={client}, proxy={'yes' if proxy else 'no'}")
-        try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-            if result.returncode == 0:
-                audio_files = glob.glob(os.path.join(tmpdir, "audio.*"))
-                if audio_files:
-                    return audio_files[0], ""
-            last_error = result.stderr[:300]
-            app.logger.error(f"client={client} failed: {last_error}")
-        except subprocess.TimeoutExpired:
-            last_error = f"Timeout with client={client}"
-        except Exception as e:
-            last_error = str(e)
+    try:
+        for client in ["ios,web", "android,web", "web"]:
+            cmd = base_cmd + ["--extractor-args", f"youtube:player_client={client}", url]
+            app.logger.info(f"Trying client={client}, proxy={'yes' if proxy else 'no'}")
+            try:
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+                if result.returncode == 0:
+                    audio_files = glob.glob(os.path.join(tmpdir, "audio.*"))
+                    if audio_files:
+                        return audio_files[0], ""
+                last_error = result.stderr[:300]
+                app.logger.error(f"client={client} failed: {last_error}")
+            except subprocess.TimeoutExpired:
+                last_error = f"Timeout with client={client}"
+            except Exception as e:
+                last_error = str(e)
 
-    return None, f"proxy={'yes' if proxy else 'no'}, last_error={last_error}"
+        return None, f"proxy={'yes' if proxy else 'no'}, last_error={last_error}"
+    finally:
+        # Kill the POT server
+        if pot_server:
+            pot_server.terminate()
+            try:
+                pot_server.wait(timeout=5)
+            except Exception:
+                pot_server.kill()
 
 
 def transcribe_audio(audio_path: str) -> list[dict]:
