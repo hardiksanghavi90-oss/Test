@@ -43,9 +43,9 @@ def transcribe():
         return jsonify({"error": "video_id required"}), 400
 
     try:
-        audio_path = download_audio(video_id)
+        audio_path, error_detail = download_audio(video_id)
         if not audio_path:
-            return jsonify({"error": "audio download failed"}), 502
+            return jsonify({"error": "audio download failed", "detail": error_detail}), 502
 
         segments = transcribe_audio(audio_path)
         return jsonify({"segments": segments, "video_id": video_id})
@@ -54,8 +54,9 @@ def transcribe():
         return jsonify({"error": str(e)}), 500
 
 
-def download_audio(video_id: str) -> str | None:
-    """Download audio from YouTube using yt-dlp with proxy support."""
+def download_audio(video_id: str) -> tuple[str | None, str]:
+    """Download audio from YouTube using yt-dlp with proxy support.
+    Returns (audio_path, error_detail)."""
     import subprocess
 
     url = f"https://www.youtube.com/watch?v={video_id}"
@@ -63,6 +64,7 @@ def download_audio(video_id: str) -> str | None:
     output_path = os.path.join(tmpdir, "audio")
 
     proxy = os.environ.get("PROXY_URL", "")
+    last_error = ""
 
     # Build base command
     base_cmd = [
@@ -81,16 +83,20 @@ def download_audio(video_id: str) -> str | None:
     for client in ["ios,web", "android,web", "web"]:
         cmd = base_cmd + ["--extractor-args", f"youtube:player_client={client}", url]
         app.logger.info(f"Trying client={client}, proxy={'yes' if proxy else 'no'}")
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
-        )
-        if result.returncode == 0:
-            break
-    else:
-        app.logger.error(f"yt-dlp failed: {result.stderr[:500]}")
-        return None
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            if result.returncode == 0:
+                audio_files = glob.glob(os.path.join(tmpdir, "audio.*"))
+                if audio_files:
+                    return audio_files[0], ""
+            last_error = result.stderr[:300]
+            app.logger.error(f"client={client} failed: {last_error}")
+        except subprocess.TimeoutExpired:
+            last_error = f"Timeout with client={client}"
+        except Exception as e:
+            last_error = str(e)
 
-    audio_files = glob.glob(os.path.join(tmpdir, "audio.*"))
-    return audio_files[0] if audio_files else None
+    return None, f"proxy={'yes' if proxy else 'no'}, last_error={last_error}"
 
 
 def transcribe_audio(audio_path: str) -> list[dict]:

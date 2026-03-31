@@ -189,7 +189,7 @@ def _get_from_worker(video_id: str) -> list[dict] | None:
                 {"start": s["start"], "end": s["end"], "text": s["text"]}
                 for s in segments if s.get("text")
             ]
-        print(f"  Worker error: {resp.status_code} {resp.text[:200]}")
+        print(f"  Worker error: {resp.status_code} {resp.text[:500]}")
     except Exception as e:
         print(f"  Worker call failed: {e}")
     return None
