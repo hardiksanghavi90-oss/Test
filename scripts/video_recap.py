@@ -293,28 +293,23 @@ def analyze_with_claude(video: dict, timestamps: list[dict],
 
 {context}
 
-TASK: Return INDIVIDUAL timestamps for each specific business/tech topic. Do NOT group or aggregate multiple topics into one entry. Each entry = one specific post or topic discussed at that moment in the video.
+TASK: For each chapter/timestamp above, decide if it's business-relevant and return it with a useful summary.
 
-INCLUDE topics about: Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, AI/ML, engineering, manufacturing, rockets, product strategy, scaling, leadership, energy, batteries, autonomous driving, robotics, company building.
+INCLUDE chapters about: Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, AI/ML, engineering, manufacturing, rockets, product strategy, scaling, leadership, energy, batteries, autonomous driving, robotics, company building.
 
-EXCLUDE: Politics, social commentary, culture war, morality quotes, memes, jokes, personal life, celebrity gossip, government, DOGE, regulations.
+EXCLUDE chapters about: Politics, social commentary, culture war, morality quotes, memes, jokes, personal life, celebrity gossip, government, DOGE, regulations. Also exclude "Intro" and generic "Random" sections unless the topic name suggests business content.
 
-IMPORTANT RULES:
-- Each entry must be a SINGLE specific topic at a SINGLE timestamp
-- Do NOT combine multiple posts into one entry like "12 posts about SpaceX"
-- Instead list each one separately: "Falcon Heavy launch", "Starship test update", etc.
-- Use the exact timestamps from the description if available
-- "topic" should be specific (e.g. "Grok auto-translation launch") not vague (e.g. "AI updates")
+For each RELEVANT chapter, return:
+- "timestamp": the exact timestamp from the description (e.g. "4:04")
+- "seconds": total seconds (e.g. 244)
+- "topic": a descriptive label for the section (use the description label but make it more specific if possible, e.g. "SpaceX Launches & Starship" instead of just "SpaceX")
+- "summary": 1 sentence describing what business topics are covered in this section
+- "company": primary company discussed (e.g. "SpaceX", "xAI", "Tesla")
 
-For each relevant segment:
-- "timestamp": exact start time (e.g. "2:15")
-- "seconds": total seconds (e.g. 135)
-- "topic": specific topic label for THIS one segment
-- "summary": 1 sentence about what Elon said/posted about this specific topic
-- "company": which company (e.g. "xAI", "SpaceX", "Tesla")
+IMPORTANT: Return one entry per chapter. Do NOT skip chapters that are business-relevant. Use the exact timestamps provided.
 
-Return ONLY a JSON array. If no business segments, return [].
-Example: [{{"timestamp":"2:15","seconds":135,"topic":"Grok auto-translation","summary":"Elon confirms Grok now auto-translates posts across languages on X.","company":"xAI"}},{{"timestamp":"4:30","seconds":270,"topic":"Falcon Heavy landing","summary":"Elon celebrates successful Falcon Heavy booster landing.","company":"SpaceX"}}]"""
+Return ONLY a JSON array. If no business chapters found, return [].
+Example: [{{"timestamp":"4:04","seconds":244,"topic":"SpaceX Launches & Starship Development","summary":"Covers 12 posts about Falcon Heavy launches, Starship progress, and rocket engineering milestones.","company":"SpaceX"}}]"""
 
     try:
         message = client.messages.create(
