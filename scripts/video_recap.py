@@ -87,31 +87,188 @@ def _get_video_details(video_id: str, api_key: str) -> dict | None:
 def parse_description_timestamps(description: str) -> list[dict]:
     """Extract timestamps from video description (e.g. '2:15 - Grok update')."""
     timestamps = []
-    # Match patterns like "0:00 - Topic" or "1:23:45 Topic" or "02:15 Topic"
     pattern = re.compile(
         r"(?:^|\n)\s*(\d{1,2}:\d{2}(?::\d{2})?)\s*[-–—:]?\s*(.+?)(?:\n|$)"
     )
     for match in pattern.finditer(description):
         time_str = match.group(1)
         topic = match.group(2).strip()
-
-        # Convert to seconds
         parts = time_str.split(":")
         if len(parts) == 3:
             seconds = int(parts[0]) * 3600 + int(parts[1]) * 60 + int(parts[2])
         else:
             seconds = int(parts[0]) * 60 + int(parts[1])
-
         timestamps.append({
             "timestamp": time_str,
             "seconds": seconds,
             "topic": topic,
         })
-
     return timestamps
 
 
-def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
+def get_transcript_direct(video_id: str) -> str | None:
+    """Fetch YouTube captions by scraping the video page for caption track URLs.
+    This bypasses youtube-transcript-api and yt-dlp which get blocked from cloud IPs."""
+    video_url = f"https://www.youtube.com/watch?v={video_id}"
+    print(f"  Attempting direct caption scrape for {video_id}...")
+
+    try:
+        # Fetch the YouTube video page HTML
+        resp = requests.get(
+            video_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+            },
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            print(f"  YouTube page returned {resp.status_code}")
+            return None
+
+        html_text = resp.text
+
+        # Extract the caption tracks from the page's ytInitialPlayerResponse
+        # Look for "captionTracks" in the JavaScript data
+        caption_match = re.search(r'"captionTracks"\s*:\s*(\[.*?\])', html_text)
+        if not caption_match:
+            print("  No captionTracks found in page HTML")
+            # Try alternate pattern
+            caption_match = re.search(r'"captions"\s*:\s*\{.*?"captionTracks"\s*:\s*(\[.*?\])', html_text, re.DOTALL)
+            if not caption_match:
+                print("  No captions data found at all")
+                return None
+
+        import urllib.parse
+
+        tracks_json = caption_match.group(1)
+        # Fix any escaped characters
+        tracks_json = tracks_json.replace('\\"', '"').replace('\\/', '/')
+
+        try:
+            tracks = json.loads(tracks_json)
+        except json.JSONDecodeError:
+            # Try to extract just the baseUrl
+            url_match = re.search(r'"baseUrl"\s*:\s*"(https://www\.youtube\.com/api/timedtext[^"]*)"', tracks_json)
+            if url_match:
+                tracks = [{"baseUrl": url_match.group(1).replace('\\u0026', '&'), "languageCode": "en"}]
+            else:
+                print("  Could not parse caption tracks JSON")
+                return None
+
+        print(f"  Found {len(tracks)} caption track(s)")
+
+        # Find English caption track
+        caption_url = None
+        for track in tracks:
+            lang = track.get("languageCode", "")
+            if lang.startswith("en"):
+                caption_url = track.get("baseUrl", "")
+                break
+
+        # If no English, try the first available with auto-translate
+        if not caption_url and tracks:
+            caption_url = tracks[0].get("baseUrl", "")
+            if caption_url and "en" not in tracks[0].get("languageCode", ""):
+                # Add translation parameter
+                caption_url += "&tlang=en"
+
+        if not caption_url:
+            print("  No suitable caption URL found")
+            return None
+
+        # Fix URL encoding
+        caption_url = caption_url.replace('\\u0026', '&').replace('&amp;', '&')
+
+        # Request JSON3 format for easier parsing
+        if 'fmt=' not in caption_url:
+            caption_url += "&fmt=json3"
+        else:
+            caption_url = re.sub(r'fmt=\w+', 'fmt=json3', caption_url)
+
+        print(f"  Fetching captions from: {caption_url[:100]}...")
+
+        cap_resp = requests.get(
+            caption_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            },
+            timeout=15,
+        )
+        if cap_resp.status_code != 200:
+            print(f"  Caption fetch returned {cap_resp.status_code}")
+            return None
+
+        # Parse JSON3 format
+        try:
+            cap_data = cap_resp.json()
+        except json.JSONDecodeError:
+            # Maybe it returned XML instead, try parsing as XML
+            print("  Response isn't JSON, trying XML parse...")
+            return _parse_xml_captions(cap_resp.text)
+
+        events = cap_data.get("events", [])
+        lines = []
+        for event in events:
+            start_ms = event.get("tStartMs", 0)
+            seconds = int(start_ms / 1000)
+            segs = event.get("segs", [])
+            text = "".join(s.get("utf8", "") for s in segs).strip()
+            if not text or text == "\n":
+                continue
+
+            mins, secs = divmod(seconds, 60)
+            hours, mins = divmod(mins, 60)
+            if hours:
+                ts = f"{hours}:{mins:02d}:{secs:02d}"
+            else:
+                ts = f"{mins}:{secs:02d}"
+            lines.append(f"[{ts}] {text}")
+
+        if lines:
+            result = "\n".join(lines)
+            print(f"  Direct scrape transcript: {len(result)} chars, {len(lines)} lines")
+            return result
+
+        print("  No caption lines extracted from JSON3")
+        return None
+
+    except Exception as e:
+        print(f"  Direct caption scrape error: {type(e).__name__}: {e}")
+        return None
+
+
+def _parse_xml_captions(xml_text: str) -> str | None:
+    """Parse YouTube XML caption format as fallback."""
+    try:
+        lines = []
+        for match in re.finditer(r'<text start="([\d.]+)"[^>]*>(.*?)</text>', xml_text):
+            seconds = int(float(match.group(1)))
+            text = match.group(2).strip()
+            # Decode HTML entities
+            text = text.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>')
+            text = text.replace('&#39;', "'").replace('&quot;', '"')
+            if not text:
+                continue
+            mins, secs = divmod(seconds, 60)
+            hours, mins = divmod(mins, 60)
+            if hours:
+                ts = f"{hours}:{mins:02d}:{secs:02d}"
+            else:
+                ts = f"{mins}:{secs:02d}"
+            lines.append(f"[{ts}] {text}")
+
+        if lines:
+            result = "\n".join(lines)
+            print(f"  XML caption transcript: {len(result)} chars, {len(lines)} lines")
+            return result
+    except Exception as e:
+        print(f"  XML parse error: {e}")
+    return None
+
+
+def analyze_with_claude(video: dict, timestamps: list[dict],
+                        transcript: str | None = None) -> list[dict]:
     """Use Claude to classify which timestamps are business-relevant."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -120,14 +277,16 @@ def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # If we have description timestamps, use those
-    if timestamps:
+    # Build context: prefer transcript (most detail), then timestamps, then description
+    if transcript:
+        # Truncate to fit in context window
+        context = f"Video: {video['title']}\n\nFULL TRANSCRIPT (with timestamps):\n{transcript[:12000]}"
+    elif timestamps:
         ts_text = "\n".join(
             f"- {t['timestamp']} {t['topic']}" for t in timestamps
         )
         context = f"Video: {video['title']}\n\nChapters/Timestamps from description:\n{ts_text}"
     else:
-        # No timestamps — use the full description for Claude to analyze
         context = f"Video: {video['title']}\n\nVideo description:\n{video.get('description', 'No description available')}"
 
     prompt = f"""Analyze this YouTube video that recaps Elon Musk's daily X/Twitter posts.
@@ -326,7 +485,11 @@ def process_video() -> tuple[str, str]:
     print(f"Found: {video['title']}")
     print(f"URL: {video['url']}")
 
-    # Try to parse timestamps from video description
+    # Try to get the full transcript first (best source of detail)
+    print("Attempting to fetch full transcript...")
+    transcript = get_transcript_direct(video["id"])
+
+    # Also parse description timestamps as fallback
     description = video.get("description", "")
     print(f"Description length: {len(description)} chars")
     timestamps = parse_description_timestamps(description)
@@ -338,9 +501,9 @@ def process_video() -> tuple[str, str]:
         if len(timestamps) > 5:
             print(f"  ... and {len(timestamps) - 5} more")
 
-    # Use Claude to classify which segments are business-relevant
+    # Use Claude to analyze — pass transcript if we got it
     print("Analyzing segments with Claude...")
-    segments = analyze_with_claude(video, timestamps)
+    segments = analyze_with_claude(video, timestamps, transcript=transcript)
     print(f"Final: {len(segments)} business-relevant segments")
 
     section_html = build_video_section(video, segments)
