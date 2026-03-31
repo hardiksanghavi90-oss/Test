@@ -224,26 +224,37 @@ def classify_and_summarize(posts: list) -> list:
         else:
             thread_text = f"@elonmusk: \"{p['text']}\""
 
-        prompt = f"""You are analyzing an Elon Musk post (and its full conversation thread) for a daily business insights digest aimed at entrepreneurs and operators.
+        prompt = f"""You are a strict filter for a daily business insights digest aimed at entrepreneurs and operators. You must analyze this Elon Musk post (and its conversation thread) and decide if it belongs.
 
 FULL CONVERSATION THREAD:
 {thread_text}
 
-TASK: First classify, then summarize.
+STRICT CLASSIFICATION RULES:
+- Mark as NOT relevant (relevant: false) if ANY of these apply:
+  * You cannot determine what the conversation is actually about (missing context, image-only content, cryptic with no clear business meaning)
+  * The post is just agreement ("Yes", "True", "Exactly", emoji) WITHOUT clear business context in the thread
+  * It's about politics, social commentary, culture war, justice system, morality quotes, partisan opinions
+  * It's a meme, joke, or casual banter with no business substance
+  * It's a motivational or philosophical quote not directly tied to building/running a business
+  * It's about celebrities, personal life, or gossip
 
-1. CLASSIFY: Is this post relevant to business, entrepreneurship, technology, engineering, product strategy, leadership, company building, AI/ML, space, energy, manufacturing, or similar topics that would help an entrepreneur or operator?
-   - NOT relevant: politics, social commentary, culture war, memes with no business angle, personal jokes, motivational quotes about life/justice/morality, partisan opinions, celebrity gossip
-   - IS relevant: insights on building companies, product decisions, engineering challenges, AI developments, market strategy, leadership philosophy applied to business, manufacturing insights, space/tech milestones
+- Mark as relevant (relevant: true) ONLY if the thread CLEARLY discusses:
+  * Building companies, products, or technology (Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, etc.)
+  * Engineering decisions, manufacturing, scaling, or technical challenges
+  * AI/ML developments, model training, compute infrastructure
+  * Business strategy, hiring, leadership, execution, market dynamics
+  * Space exploration milestones or rocket engineering
+  * Energy, batteries, autonomous driving, robotics
 
-2. If RELEVANT, write a 2-3 sentence business insight summary that:
-   - Explains the full context (what the thread is about, not just Elon's reply)
-   - Extracts the actionable business insight or lesson
-   - Mentions which company/product if applicable (Tesla, SpaceX, xAI, Grok, Starlink, etc.)
+When in doubt, mark as NOT relevant. Be very strict.
 
-Respond in this exact JSON format:
-{{"relevant": true/false, "summary": "your summary here or null if not relevant"}}
+If RELEVANT, write a 2-3 sentence summary that:
+1. Explains the FULL context of the conversation (not just Elon's short reply)
+2. Extracts the specific business insight, lesson, or takeaway
+3. Names which company/product it relates to
 
-Return ONLY the JSON, nothing else."""
+Respond ONLY with this exact JSON:
+{{"relevant": true/false, "summary": "your summary here or null if not relevant"}}"""
 
         try:
             message = ai_client.messages.create(
