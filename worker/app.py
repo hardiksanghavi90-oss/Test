@@ -55,28 +55,33 @@ def transcribe():
 
 
 def download_audio(video_id: str) -> str | None:
-    """Download audio from YouTube using yt-dlp."""
+    """Download audio from YouTube using yt-dlp with proxy support."""
     import subprocess
 
     url = f"https://www.youtube.com/watch?v={video_id}"
     tmpdir = tempfile.mkdtemp()
     output_path = os.path.join(tmpdir, "audio")
 
+    proxy = os.environ.get("PROXY_URL", "")
+
+    # Build base command
+    base_cmd = [
+        "yt-dlp",
+        "--extract-audio",
+        "--audio-format", "wav",
+        "--postprocessor-args", "ffmpeg:-ar 16000 -ac 1",
+        "--format", "worstaudio",
+        "--output", output_path + ".%(ext)s",
+        "--no-playlist",
+    ]
+    if proxy:
+        base_cmd += ["--proxy", proxy]
+
     # Try multiple player clients
     for client in ["ios,web", "android,web", "web"]:
-        result = subprocess.run(
-            [
-                "yt-dlp",
-                "--extract-audio",
-                "--audio-format", "wav",
-                "--postprocessor-args", "ffmpeg:-ar 16000 -ac 1",
-                "--format", "worstaudio",
-                "--output", output_path + ".%(ext)s",
-                "--no-playlist",
-                "--extractor-args", f"youtube:player_client={client}",
-                url,
-            ],
-            capture_output=True, text=True, timeout=120,
+        cmd = base_cmd + ["--extractor-args", f"youtube:player_client={client}", url]
+        app.logger.info(f"Trying client={client}, proxy={'yes' if proxy else 'no'}")
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
         )
         if result.returncode == 0:
             break
