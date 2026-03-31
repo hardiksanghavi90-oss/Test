@@ -264,13 +264,14 @@ Respond ONLY with this exact JSON:
             )
             response_text = message.content[0].text.strip()
 
-            # Parse JSON response
-            # Handle potential markdown wrapping
-            if response_text.startswith("```"):
-                response_text = re.sub(r"^```json?\s*", "", response_text)
-                response_text = re.sub(r"\s*```$", "", response_text)
+            # Extract JSON object from response (Claude may add extra text)
+            json_match = re.search(r'\{[^{}]*"relevant"\s*:\s*(true|false)[^{}]*\}',
+                                   response_text, re.DOTALL)
+            if not json_match:
+                print(f"  Post {i+1}/{len(posts)}: No JSON found in response — filtering out")
+                continue
 
-            result = json.loads(response_text)
+            result = json.loads(json_match.group(0))
 
             if result.get("relevant"):
                 p["ai_summary"] = result.get("summary")
