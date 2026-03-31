@@ -74,59 +74,132 @@ def _search_via_rss() -> dict | None:
 
 
 def get_transcript(video_id: str) -> str | None:
-    """Fetch YouTube auto-captions/transcript for a video."""
-    try:
-        from youtube_transcript_api import YouTubeTranscriptApi
+    """Fetch YouTube auto-captions using yt-dlp (works from cloud IPs)."""
+    import subprocess
+    import tempfile
 
-        print(f"  Using youtube-transcript-api to fetch transcript...")
+    video_url = f"https://www.youtube.com/watch?v={video_id}"
+    print(f"  Downloading subtitles via yt-dlp for {video_id}...")
 
-        # Try the newer API first (v1.x+)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        sub_path = os.path.join(tmpdir, "subs")
         try:
-            ytt_api = YouTubeTranscriptApi()
-            transcript_data = ytt_api.fetch(video_id, languages=["en"])
-            entries = []
-            for snippet in transcript_data:
-                entries.append({
-                    "start": snippet.start,
-                    "text": snippet.text,
-                })
-            print(f"  Got {len(entries)} transcript entries (new API)")
-        except (TypeError, AttributeError):
-            # Fall back to older API style (v0.x)
-            print("  Trying older API style...")
-            try:
-                entries_raw = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
-                entries = [{"start": e["start"], "text": e["text"]} for e in entries_raw]
-                print(f"  Got {len(entries)} transcript entries (old API)")
-            except Exception as e2:
-                print(f"  Old API also failed: {e2}")
-                return None
+            result = subprocess.run(
+                [
+                    "yt-dlp",
+                    "--skip-download",
+                    "--write-auto-sub",
+                    "--sub-lang", "en",
+                    "--sub-format", "json3",
+                    "--output", sub_path,
+                    video_url,
+                ],
+                capture_output=True, text=True, timeout=60,
+            )
+            print(f"  yt-dlp exit code: {result.returncode}")
+            if result.returncode != 0:
+                print(f"  yt-dlp stderr: {result.stderr[:500]}")
 
-        if not entries:
-            print("  Transcript is empty")
+            # Look for the subtitle file
+            sub_file = sub_path + ".en.json3"
+            if not os.path.exists(sub_file):
+                # Try alternate naming
+                import glob
+                candidates = glob.glob(os.path.join(tmpdir, "*.json3"))
+                if candidates:
+                    sub_file = candidates[0]
+                else:
+                    print(f"  No subtitle file found in {tmpdir}")
+                    # Try VTT format as fallback
+                    return _try_vtt_fallback(video_url, tmpdir, sub_path)
+
+            with open(sub_file, "r") as f:
+                data = json.load(f)
+
+            events = data.get("events", [])
+            lines = []
+            for event in events:
+                start_ms = event.get("tStartMs", 0)
+                seconds = int(start_ms / 1000)
+
+                # Build text from segments
+                segs = event.get("segs", [])
+                text = "".join(s.get("utf8", "") for s in segs).strip()
+                if not text or text == "\n":
+                    continue
+
+                mins, secs = divmod(seconds, 60)
+                hours, mins = divmod(mins, 60)
+                if hours:
+                    ts = f"{hours}:{mins:02d}:{secs:02d}"
+                else:
+                    ts = f"{mins}:{secs:02d}"
+                lines.append(f"[{ts}] {text}")
+
+            result_text = "\n".join(lines)
+            print(f"  Transcript assembled: {len(result_text)} chars, {len(lines)} lines")
+            return result_text if lines else None
+
+        except subprocess.TimeoutExpired:
+            print("  yt-dlp timed out after 60s")
+            return None
+        except Exception as e:
+            print(f"  Transcript fetch error: {type(e).__name__}: {e}")
             return None
 
-        # Format as timestamped text
+
+def _try_vtt_fallback(video_url: str, tmpdir: str, sub_path: str) -> str | None:
+    """Try downloading VTT format as fallback."""
+    import subprocess
+    import glob
+
+    print("  Trying VTT format fallback...")
+    try:
+        subprocess.run(
+            [
+                "yt-dlp",
+                "--skip-download",
+                "--write-auto-sub",
+                "--sub-lang", "en",
+                "--sub-format", "vtt",
+                "--output", sub_path,
+                video_url,
+            ],
+            capture_output=True, text=True, timeout=60,
+        )
+        candidates = glob.glob(os.path.join(tmpdir, "*.vtt"))
+        if not candidates:
+            print("  No VTT file found either")
+            return None
+
+        with open(candidates[0], "r") as f:
+            vtt_text = f.read()
+
+        # Parse VTT: extract timestamps and text
         lines = []
-        for entry in entries:
-            seconds = int(entry["start"])
-            mins, secs = divmod(seconds, 60)
+        for match in re.finditer(
+            r"(\d{2}):(\d{2}):(\d{2})\.\d+\s*-->.*?\n(.+?)(?:\n\n|\Z)",
+            vtt_text, re.DOTALL
+        ):
+            h, m, s = int(match.group(1)), int(match.group(2)), int(match.group(3))
+            text = re.sub(r"<[^>]+>", "", match.group(4)).strip()
+            if not text:
+                continue
+            total_s = h * 3600 + m * 60 + s
+            mins, secs = divmod(total_s, 60)
             hours, mins = divmod(mins, 60)
             if hours:
                 ts = f"{hours}:{mins:02d}:{secs:02d}"
             else:
                 ts = f"{mins}:{secs:02d}"
-            lines.append(f"[{ts}] {entry['text']}")
+            lines.append(f"[{ts}] {text}")
 
-        result = "\n".join(lines)
-        print(f"  Transcript assembled: {len(result)} chars, {len(lines)} lines")
-        return result
+        result_text = "\n".join(lines)
+        print(f"  VTT transcript: {len(result_text)} chars, {len(lines)} lines")
+        return result_text if lines else None
 
-    except ImportError as e:
-        print(f"  youtube-transcript-api not installed or import error: {e}")
-        return None
     except Exception as e:
-        print(f"  Transcript fetch error: {type(e).__name__}: {e}")
+        print(f"  VTT fallback error: {e}")
         return None
 
 
