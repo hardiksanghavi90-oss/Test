@@ -24,14 +24,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Set up Node.js (needed by yt-dlp)
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
       - name: Install dependencies
         run: pip install -r requirements.txt
 

@@ -106,122 +106,7 @@ def parse_description_timestamps(description: str) -> list[dict]:
     return timestamps
 
 
-def download_and_transcribe(video_id: str) -> str | None:
-    """Download audio via yt-dlp and transcribe with faster-whisper."""
-    import subprocess
-    import tempfile
-    import glob
-
-    video_url = f"https://www.youtube.com/watch?v={video_id}"
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        audio_path = os.path.join(tmpdir, "audio")
-
-        # Step 1: Download audio only with yt-dlp
-        # Use iOS player client to bypass YouTube JS challenge
-        print("  Downloading audio via yt-dlp (iOS client)...")
-        try:
-            result = subprocess.run(
-                [
-                    "yt-dlp",
-                    "--extract-audio",
-                    "--audio-format", "mp3",
-                    "--audio-quality", "5",
-                    "--output", audio_path + ".%(ext)s",
-                    "--no-playlist",
-                    "--extractor-args", "youtube:player_client=ios,web",
-                    video_url,
-                ],
-                capture_output=True, text=True, timeout=180,
-            )
-            print(f"  yt-dlp exit code: {result.returncode}")
-            if result.returncode != 0:
-                stderr = result.stderr[:500]
-                print(f"  yt-dlp stderr: {stderr}")
-                # Try android client as fallback
-                print("  Retrying with android client...")
-                result = subprocess.run(
-                    [
-                        "yt-dlp",
-                        "--extract-audio",
-                        "--audio-format", "mp3",
-                        "--audio-quality", "5",
-                        "--output", audio_path + ".%(ext)s",
-                        "--no-playlist",
-                        "--extractor-args", "youtube:player_client=android,web",
-                        video_url,
-                    ],
-                    capture_output=True, text=True, timeout=180,
-                )
-                print(f"  yt-dlp retry exit code: {result.returncode}")
-                if result.returncode != 0:
-                    print(f"  yt-dlp retry stderr: {result.stderr[:500]}")
-                    return None
-
-        except subprocess.TimeoutExpired:
-            print("  yt-dlp timed out")
-            return None
-        except FileNotFoundError:
-            print("  yt-dlp not found")
-            return None
-
-        # Find the downloaded audio file
-        audio_files = glob.glob(os.path.join(tmpdir, "audio.*"))
-        if not audio_files:
-            print("  No audio file downloaded")
-            return None
-
-        audio_file = audio_files[0]
-        file_size = os.path.getsize(audio_file)
-        print(f"  Audio downloaded: {audio_file} ({file_size / 1024 / 1024:.1f} MB)")
-
-        # Step 2: Transcribe with faster-whisper
-        print("  Transcribing with faster-whisper (base model)...")
-        try:
-            from faster_whisper import WhisperModel
-
-            model = WhisperModel("base", device="cpu", compute_type="int8")
-            segments_iter, info = model.transcribe(
-                audio_file,
-                language="en",
-                beam_size=3,
-                vad_filter=True,  # skip silence
-            )
-            print(f"  Detected language: {info.language} (prob: {info.language_probability:.2f})")
-
-            lines = []
-            for segment in segments_iter:
-                seconds = int(segment.start)
-                text = segment.text.strip()
-                if not text:
-                    continue
-
-                mins, secs = divmod(seconds, 60)
-                hours, mins = divmod(mins, 60)
-                if hours:
-                    ts = f"{hours}:{mins:02d}:{secs:02d}"
-                else:
-                    ts = f"{mins}:{secs:02d}"
-                lines.append(f"[{ts}] {text}")
-
-            if lines:
-                transcript = "\n".join(lines)
-                print(f"  Transcription complete: {len(transcript)} chars, {len(lines)} segments")
-                return transcript
-            else:
-                print("  Transcription produced no segments")
-                return None
-
-        except ImportError as e:
-            print(f"  faster-whisper not available: {e}")
-            return None
-        except Exception as e:
-            print(f"  Transcription error: {type(e).__name__}: {e}")
-            return None
-
-
-def analyze_with_claude(video: dict, timestamps: list[dict],
-                        transcript: str | None = None) -> list[dict]:
+def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
     """Use Claude to classify which timestamps are business-relevant."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -230,11 +115,8 @@ def analyze_with_claude(video: dict, timestamps: list[dict],
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # Build context: prefer transcript (most detail), then timestamps, then description
-    if transcript:
-        # Truncate to fit in context window
-        context = f"Video: {video['title']}\n\nFULL TRANSCRIPT (with timestamps):\n{transcript[:12000]}"
-    elif timestamps:
+    # Build context from timestamps or description
+    if timestamps:
         ts_text = "\n".join(
             f"- {t['timestamp']} {t['topic']}" for t in timestamps
         )
@@ -433,25 +315,21 @@ def process_video() -> tuple[str, str]:
     print(f"Found: {video['title']}")
     print(f"URL: {video['url']}")
 
-    # Download audio and transcribe with Whisper for full transcript
-    print("Downloading and transcribing video audio...")
-    transcript = download_and_transcribe(video["id"])
-
-    # Also parse description timestamps as fallback
+    # Parse description timestamps
     description = video.get("description", "")
     print(f"Description length: {len(description)} chars")
     timestamps = parse_description_timestamps(description)
     print(f"Found {len(timestamps)} timestamps in description")
 
     if timestamps:
-        for ts in timestamps[:5]:
+        for ts in timestamps[:8]:
             print(f"  {ts['timestamp']} - {ts['topic']}")
-        if len(timestamps) > 5:
-            print(f"  ... and {len(timestamps) - 5} more")
+        if len(timestamps) > 8:
+            print(f"  ... and {len(timestamps) - 8} more")
 
-    # Use Claude to analyze — pass transcript if we got it
+    # Use Claude to classify which chapters are business-relevant
     print("Analyzing segments with Claude...")
-    segments = analyze_with_claude(video, timestamps, transcript=transcript)
+    segments = analyze_with_claude(video, timestamps)
     print(f"Final: {len(segments)} business-relevant segments")
 
     section_html = build_video_section(video, segments)
