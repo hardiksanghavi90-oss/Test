@@ -134,24 +134,28 @@ def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
 
 {context}
 
-TASK: Identify segments that are about BUSINESS, TECH, or BUILDING topics.
+TASK: Return INDIVIDUAL timestamps for each specific business/tech topic. Do NOT group or aggregate multiple topics into one entry. Each entry = one specific post or topic discussed at that moment in the video.
 
-INCLUDE: Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, AI/ML, engineering,
-manufacturing, rockets, product strategy, scaling, leadership, energy, batteries,
-autonomous driving, robotics, company building.
+INCLUDE topics about: Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, AI/ML, engineering, manufacturing, rockets, product strategy, scaling, leadership, energy, batteries, autonomous driving, robotics, company building.
 
-EXCLUDE: Politics, social commentary, culture war, morality quotes, memes, jokes,
-personal life, celebrity gossip, government, DOGE, regulations.
+EXCLUDE: Politics, social commentary, culture war, morality quotes, memes, jokes, personal life, celebrity gossip, government, DOGE, regulations.
 
-For each relevant segment, provide:
-- "timestamp": start time (e.g. "2:15")
+IMPORTANT RULES:
+- Each entry must be a SINGLE specific topic at a SINGLE timestamp
+- Do NOT combine multiple posts into one entry like "12 posts about SpaceX"
+- Instead list each one separately: "Falcon Heavy launch", "Starship test update", etc.
+- Use the exact timestamps from the description if available
+- "topic" should be specific (e.g. "Grok auto-translation launch") not vague (e.g. "AI updates")
+
+For each relevant segment:
+- "timestamp": exact start time (e.g. "2:15")
 - "seconds": total seconds (e.g. 135)
-- "topic": short topic label
-- "summary": 1 sentence business insight
+- "topic": specific topic label for THIS one segment
+- "summary": 1 sentence about what Elon said/posted about this specific topic
 - "company": which company (e.g. "xAI", "SpaceX", "Tesla")
 
 Return ONLY a JSON array. If no business segments, return [].
-Example: [{{"timestamp":"2:15","seconds":135,"topic":"Grok Translation","summary":"Elon announces auto-translation feature for X posts.","company":"xAI"}}]"""
+Example: [{{"timestamp":"2:15","seconds":135,"topic":"Grok auto-translation","summary":"Elon confirms Grok now auto-translates posts across languages on X.","company":"xAI"}},{{"timestamp":"4:30","seconds":270,"topic":"Falcon Heavy landing","summary":"Elon celebrates successful Falcon Heavy booster landing.","company":"SpaceX"}}]"""
 
     try:
         message = client.messages.create(
