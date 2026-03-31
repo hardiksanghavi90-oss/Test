@@ -106,7 +106,101 @@ def parse_description_timestamps(description: str) -> list[dict]:
     return timestamps
 
 
-def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
+def transcribe_with_assemblyai(video_url: str) -> str | None:
+    """Transcribe a YouTube video using AssemblyAI (they handle the download)."""
+    api_key = os.environ.get("ASSEMBLYAI_API_KEY")
+    if not api_key:
+        print("  ASSEMBLYAI_API_KEY not set — skipping transcription")
+        return None
+
+    headers = {"authorization": api_key, "content-type": "application/json"}
+
+    # Submit transcription job
+    print(f"  Submitting to AssemblyAI: {video_url}")
+    resp = requests.post(
+        "https://api.assemblyai.com/v2/transcript",
+        headers=headers,
+        json={"audio_url": video_url},
+        timeout=30,
+    )
+    if resp.status_code != 200:
+        print(f"  AssemblyAI submit error: {resp.status_code} {resp.text[:200]}")
+        return None
+
+    transcript_id = resp.json().get("id")
+    print(f"  Transcription job started: {transcript_id}")
+
+    # Poll until complete (typically 2-5 min for a 20-min video)
+    poll_url = f"https://api.assemblyai.com/v2/transcript/{transcript_id}"
+    for attempt in range(60):  # max ~5 min of polling
+        time.sleep(5)
+        poll_resp = requests.get(poll_url, headers=headers, timeout=15)
+        status = poll_resp.json().get("status")
+        if status == "completed":
+            print(f"  Transcription completed (attempt {attempt + 1})")
+            break
+        elif status == "error":
+            print(f"  Transcription failed: {poll_resp.json().get('error')}")
+            return None
+        else:
+            if attempt % 6 == 0:  # log every 30s
+                print(f"  Status: {status} (waiting...)")
+    else:
+        print("  Transcription timed out after 5 minutes")
+        return None
+
+    # Extract words with timestamps
+    data = poll_resp.json()
+    words = data.get("words", [])
+
+    if not words:
+        # Fall back to full text with sentence-level timestamps
+        text = data.get("text", "")
+        if text:
+            print(f"  Got transcript text ({len(text)} chars) but no word timestamps")
+            return text
+        return None
+
+    # Group words into ~10-second chunks for readable transcript
+    lines = []
+    chunk_words = []
+    chunk_start = 0
+
+    for word in words:
+        if not chunk_words:
+            chunk_start = word["start"]
+        chunk_words.append(word["text"])
+
+        # Create a new line every ~10 seconds
+        if word["end"] - chunk_start >= 10000:  # 10 seconds in ms
+            seconds = int(chunk_start / 1000)
+            mins, secs = divmod(seconds, 60)
+            hours, mins = divmod(mins, 60)
+            if hours:
+                ts = f"{hours}:{mins:02d}:{secs:02d}"
+            else:
+                ts = f"{mins}:{secs:02d}"
+            lines.append(f"[{ts}] {' '.join(chunk_words)}")
+            chunk_words = []
+
+    # Don't forget the last chunk
+    if chunk_words:
+        seconds = int(chunk_start / 1000)
+        mins, secs = divmod(seconds, 60)
+        hours, mins = divmod(mins, 60)
+        if hours:
+            ts = f"{hours}:{mins:02d}:{secs:02d}"
+        else:
+            ts = f"{mins}:{secs:02d}"
+        lines.append(f"[{ts}] {' '.join(chunk_words)}")
+
+    transcript = "\n".join(lines)
+    print(f"  Transcript assembled: {len(transcript)} chars, {len(lines)} lines")
+    return transcript
+
+
+def analyze_with_claude(video: dict, timestamps: list[dict],
+                        transcript: str | None = None) -> list[dict]:
     """Use Claude to classify which timestamps are business-relevant."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -115,8 +209,10 @@ def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # Build context from timestamps or description
-    if timestamps:
+    # Build context: prefer full transcript, fall back to description timestamps
+    if transcript:
+        context = f"Video: {video['title']}\n\nFULL TRANSCRIPT (with timestamps):\n{transcript[:14000]}"
+    elif timestamps:
         ts_text = "\n".join(
             f"- {t['timestamp']} {t['topic']}" for t in timestamps
         )
@@ -128,23 +224,27 @@ def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
 
 {context}
 
-TASK: For each chapter/timestamp above, decide if it's business-relevant and return it with a useful summary.
+TASK: Identify EACH individual business/tech topic discussed in the video and return it with its timestamp and a summary.
 
-INCLUDE chapters about: Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, AI/ML, engineering, manufacturing, rockets, product strategy, scaling, leadership, energy, batteries, autonomous driving, robotics, company building.
+INCLUDE topics about: Tesla, SpaceX, xAI, Grok, Starlink, Neuralink, AI/ML, engineering, manufacturing, rockets, product strategy, scaling, leadership, energy, batteries, autonomous driving, robotics, company building.
 
-EXCLUDE chapters about: Politics, social commentary, culture war, morality quotes, memes, jokes, personal life, celebrity gossip, government, DOGE, regulations. Also exclude "Intro" and generic "Random" sections unless the topic name suggests business content.
+EXCLUDE topics about: Politics, social commentary, culture war, morality quotes, memes, jokes, personal life, celebrity gossip, government, DOGE, regulations.
 
-For each RELEVANT chapter, return:
-- "timestamp": the exact timestamp from the description (e.g. "4:04")
-- "seconds": total seconds (e.g. 244)
-- "topic": a descriptive label for the section (use the description label but make it more specific if possible, e.g. "SpaceX Launches & Starship" instead of just "SpaceX")
-- "summary": 1 sentence describing what business topics are covered in this section
-- "company": primary company discussed (e.g. "SpaceX", "xAI", "Tesla")
+IMPORTANT RULES:
+- Return ONE entry per INDIVIDUAL topic (e.g. "Grok auto-translation", "Falcon Heavy landing", "Starship heat shield test")
+- Do NOT group multiple topics into one entry
+- Use the EXACT timestamp from the transcript where that specific topic is first mentioned
+- "topic" must be specific (e.g. "Grok auto-translation feature") not vague ("AI stuff")
 
-IMPORTANT: Return one entry per chapter. Do NOT skip chapters that are business-relevant. Use the exact timestamps provided.
+For each relevant topic:
+- "timestamp": start time (e.g. "4:12")
+- "seconds": total seconds (e.g. 252)
+- "topic": specific topic label
+- "summary": 1 sentence about what Elon said/posted about this
+- "company": which company (e.g. "xAI", "SpaceX", "Tesla")
 
-Return ONLY a JSON array. If no business chapters found, return [].
-Example: [{{"timestamp":"4:04","seconds":244,"topic":"SpaceX Launches & Starship Development","summary":"Covers 12 posts about Falcon Heavy launches, Starship progress, and rocket engineering milestones.","company":"SpaceX"}}]"""
+Return ONLY a JSON array. If nothing relevant, return [].
+Example: [{{"timestamp":"4:12","seconds":252,"topic":"Falcon Heavy dual booster landing","summary":"Elon celebrates the successful simultaneous landing of both Falcon Heavy boosters.","company":"SpaceX"}},{{"timestamp":"6:45","seconds":405,"topic":"Grok auto-translation launch","summary":"Elon announces Grok now auto-translates and recommends posts across languages on X.","company":"xAI"}}]"""
 
     try:
         message = client.messages.create(
@@ -315,21 +415,18 @@ def process_video() -> tuple[str, str]:
     print(f"Found: {video['title']}")
     print(f"URL: {video['url']}")
 
-    # Parse description timestamps
+    # Try AssemblyAI transcription first (best quality)
+    print("Transcribing video with AssemblyAI...")
+    transcript = transcribe_with_assemblyai(video["url"])
+
+    # Also parse description timestamps as fallback
     description = video.get("description", "")
-    print(f"Description length: {len(description)} chars")
     timestamps = parse_description_timestamps(description)
-    print(f"Found {len(timestamps)} timestamps in description")
+    print(f"Found {len(timestamps)} timestamps in description (fallback)")
 
-    if timestamps:
-        for ts in timestamps[:8]:
-            print(f"  {ts['timestamp']} - {ts['topic']}")
-        if len(timestamps) > 8:
-            print(f"  ... and {len(timestamps) - 8} more")
-
-    # Use Claude to classify which chapters are business-relevant
-    print("Analyzing segments with Claude...")
-    segments = analyze_with_claude(video, timestamps)
+    # Use Claude to analyze — pass transcript if we got it
+    print("Analyzing with Claude...")
+    segments = analyze_with_claude(video, timestamps, transcript=transcript)
     print(f"Final: {len(segments)} business-relevant segments")
 
     section_html = build_video_section(video, segments)
