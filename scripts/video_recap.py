@@ -106,73 +106,7 @@ def parse_description_timestamps(description: str) -> list[dict]:
     return timestamps
 
 
-def transcribe_with_assemblyai(video_url: str) -> str | None:
-    """Transcribe a YouTube video using AssemblyAI SDK."""
-    api_key = os.environ.get("ASSEMBLYAI_API_KEY")
-    if not api_key:
-        print("  ASSEMBLYAI_API_KEY not set — skipping transcription")
-        return None
-
-    try:
-        import assemblyai as aai
-
-        aai.settings.api_key = api_key
-
-        print(f"  Submitting to AssemblyAI: {video_url}")
-        transcriber = aai.Transcriber()
-        transcript = transcriber.transcribe(video_url)
-
-        if transcript.status == aai.TranscriptStatus.error:
-            print(f"  AssemblyAI error: {transcript.error}")
-            return None
-
-        print(f"  Transcription completed")
-
-        # Use word-level timestamps if available
-        if transcript.words:
-            lines = []
-            chunk_words = []
-            chunk_start = 0
-
-            for word in transcript.words:
-                if not chunk_words:
-                    chunk_start = word.start
-                chunk_words.append(word.text)
-
-                # New line every ~10 seconds
-                if word.end - chunk_start >= 10000:
-                    seconds = int(chunk_start / 1000)
-                    mins, secs = divmod(seconds, 60)
-                    hours, mins = divmod(mins, 60)
-                    ts = f"{hours}:{mins:02d}:{secs:02d}" if hours else f"{mins}:{secs:02d}"
-                    lines.append(f"[{ts}] {' '.join(chunk_words)}")
-                    chunk_words = []
-
-            if chunk_words:
-                seconds = int(chunk_start / 1000)
-                mins, secs = divmod(seconds, 60)
-                hours, mins = divmod(mins, 60)
-                ts = f"{hours}:{mins:02d}:{secs:02d}" if hours else f"{mins}:{secs:02d}"
-                lines.append(f"[{ts}] {' '.join(chunk_words)}")
-
-            result = "\n".join(lines)
-            print(f"  Transcript assembled: {len(result)} chars, {len(lines)} lines")
-            return result
-
-        # Fallback to plain text
-        if transcript.text:
-            print(f"  Got transcript text ({len(transcript.text)} chars)")
-            return transcript.text
-
-        return None
-
-    except Exception as e:
-        print(f"  AssemblyAI error: {type(e).__name__}: {e}")
-        return None
-
-
-def analyze_with_claude(video: dict, timestamps: list[dict],
-                        transcript: str | None = None) -> list[dict]:
+def analyze_with_claude(video: dict, timestamps: list[dict]) -> list[dict]:
     """Use Claude to classify which timestamps are business-relevant."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -181,10 +115,8 @@ def analyze_with_claude(video: dict, timestamps: list[dict],
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # Build context: prefer full transcript, fall back to description timestamps
-    if transcript:
-        context = f"Video: {video['title']}\n\nFULL TRANSCRIPT (with timestamps):\n{transcript[:14000]}"
-    elif timestamps:
+    # Build context from timestamps and description
+    if timestamps:
         ts_text = "\n".join(
             f"- {t['timestamp']} {t['topic']}" for t in timestamps
         )
@@ -409,18 +341,14 @@ def process_video() -> tuple[str, str]:
     print(f"Found: {video['title']}")
     print(f"URL: {video['url']}")
 
-    # Try AssemblyAI transcription first (best quality)
-    print("Transcribing video with AssemblyAI...")
-    transcript = transcribe_with_assemblyai(video["url"])
-
-    # Also parse description timestamps as fallback
+    # Parse description timestamps
     description = video.get("description", "")
     timestamps = parse_description_timestamps(description)
-    print(f"Found {len(timestamps)} timestamps in description (fallback)")
+    print(f"Found {len(timestamps)} timestamps in description")
 
-    # Use Claude to analyze — pass transcript if we got it
+    # Use Claude to classify which are business-relevant
     print("Analyzing with Claude...")
-    segments = analyze_with_claude(video, timestamps, transcript=transcript)
+    segments = analyze_with_claude(video, timestamps)
     print(f"Final: {len(segments)} business-relevant segments")
 
     section_html = build_video_section(video, segments)
