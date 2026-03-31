@@ -107,96 +107,68 @@ def parse_description_timestamps(description: str) -> list[dict]:
 
 
 def transcribe_with_assemblyai(video_url: str) -> str | None:
-    """Transcribe a YouTube video using AssemblyAI (they handle the download)."""
+    """Transcribe a YouTube video using AssemblyAI SDK."""
     api_key = os.environ.get("ASSEMBLYAI_API_KEY")
     if not api_key:
         print("  ASSEMBLYAI_API_KEY not set — skipping transcription")
         return None
 
-    headers = {"authorization": api_key, "content-type": "application/json"}
+    try:
+        import assemblyai as aai
 
-    # Submit transcription job
-    print(f"  Submitting to AssemblyAI: {video_url}")
-    resp = requests.post(
-        "https://api.assemblyai.com/v2/transcript",
-        headers=headers,
-        json={"audio_url": video_url},
-        timeout=30,
-    )
-    if resp.status_code != 200:
-        print(f"  AssemblyAI submit error: {resp.status_code} {resp.text[:200]}")
-        return None
+        aai.settings.api_key = api_key
 
-    transcript_id = resp.json().get("id")
-    print(f"  Transcription job started: {transcript_id}")
+        print(f"  Submitting to AssemblyAI: {video_url}")
+        transcriber = aai.Transcriber()
+        transcript = transcriber.transcribe(video_url)
 
-    # Poll until complete (typically 2-5 min for a 20-min video)
-    poll_url = f"https://api.assemblyai.com/v2/transcript/{transcript_id}"
-    for attempt in range(60):  # max ~5 min of polling
-        time.sleep(5)
-        poll_resp = requests.get(poll_url, headers=headers, timeout=15)
-        status = poll_resp.json().get("status")
-        if status == "completed":
-            print(f"  Transcription completed (attempt {attempt + 1})")
-            break
-        elif status == "error":
-            print(f"  Transcription failed: {poll_resp.json().get('error')}")
+        if transcript.status == aai.TranscriptStatus.error:
+            print(f"  AssemblyAI error: {transcript.error}")
             return None
-        else:
-            if attempt % 6 == 0:  # log every 30s
-                print(f"  Status: {status} (waiting...)")
-    else:
-        print("  Transcription timed out after 5 minutes")
-        return None
 
-    # Extract words with timestamps
-    data = poll_resp.json()
-    words = data.get("words", [])
+        print(f"  Transcription completed")
 
-    if not words:
-        # Fall back to full text with sentence-level timestamps
-        text = data.get("text", "")
-        if text:
-            print(f"  Got transcript text ({len(text)} chars) but no word timestamps")
-            return text
-        return None
-
-    # Group words into ~10-second chunks for readable transcript
-    lines = []
-    chunk_words = []
-    chunk_start = 0
-
-    for word in words:
-        if not chunk_words:
-            chunk_start = word["start"]
-        chunk_words.append(word["text"])
-
-        # Create a new line every ~10 seconds
-        if word["end"] - chunk_start >= 10000:  # 10 seconds in ms
-            seconds = int(chunk_start / 1000)
-            mins, secs = divmod(seconds, 60)
-            hours, mins = divmod(mins, 60)
-            if hours:
-                ts = f"{hours}:{mins:02d}:{secs:02d}"
-            else:
-                ts = f"{mins}:{secs:02d}"
-            lines.append(f"[{ts}] {' '.join(chunk_words)}")
+        # Use word-level timestamps if available
+        if transcript.words:
+            lines = []
             chunk_words = []
+            chunk_start = 0
 
-    # Don't forget the last chunk
-    if chunk_words:
-        seconds = int(chunk_start / 1000)
-        mins, secs = divmod(seconds, 60)
-        hours, mins = divmod(mins, 60)
-        if hours:
-            ts = f"{hours}:{mins:02d}:{secs:02d}"
-        else:
-            ts = f"{mins}:{secs:02d}"
-        lines.append(f"[{ts}] {' '.join(chunk_words)}")
+            for word in transcript.words:
+                if not chunk_words:
+                    chunk_start = word.start
+                chunk_words.append(word.text)
 
-    transcript = "\n".join(lines)
-    print(f"  Transcript assembled: {len(transcript)} chars, {len(lines)} lines")
-    return transcript
+                # New line every ~10 seconds
+                if word.end - chunk_start >= 10000:
+                    seconds = int(chunk_start / 1000)
+                    mins, secs = divmod(seconds, 60)
+                    hours, mins = divmod(mins, 60)
+                    ts = f"{hours}:{mins:02d}:{secs:02d}" if hours else f"{mins}:{secs:02d}"
+                    lines.append(f"[{ts}] {' '.join(chunk_words)}")
+                    chunk_words = []
+
+            if chunk_words:
+                seconds = int(chunk_start / 1000)
+                mins, secs = divmod(seconds, 60)
+                hours, mins = divmod(mins, 60)
+                ts = f"{hours}:{mins:02d}:{secs:02d}" if hours else f"{mins}:{secs:02d}"
+                lines.append(f"[{ts}] {' '.join(chunk_words)}")
+
+            result = "\n".join(lines)
+            print(f"  Transcript assembled: {len(result)} chars, {len(lines)} lines")
+            return result
+
+        # Fallback to plain text
+        if transcript.text:
+            print(f"  Got transcript text ({len(transcript.text)} chars)")
+            return transcript.text
+
+        return None
+
+    except Exception as e:
+        print(f"  AssemblyAI error: {type(e).__name__}: {e}")
+        return None
 
 
 def analyze_with_claude(video: dict, timestamps: list[dict],
