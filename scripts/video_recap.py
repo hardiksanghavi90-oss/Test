@@ -120,7 +120,7 @@ def transcribe_with_assemblyai(video_url: str) -> str | None:
     resp = requests.post(
         "https://api.assemblyai.com/v2/transcript",
         headers=headers,
-        json={"audio_url": video_url},
+        json={"audio_url": video_url, "speech_model": "best"},
         timeout=30,
     )
     if resp.status_code != 200:
@@ -260,6 +260,27 @@ Example: [{{"timestamp":"4:12","seconds":252,"topic":"Falcon Heavy dual booster 
             return segments
     except Exception as e:
         print(f"  Claude analysis error: {e}")
+
+    # Fallback: if Claude returned nothing but we have timestamps,
+    # return business-relevant looking ones directly
+    if timestamps:
+        BUSINESS_TERMS = ["spacex", "tesla", "xai", "grok", "starlink", "neuralink",
+                          "ai", "rocket", "launch", "starship", "falcon", "optimus",
+                          "boring", "energy", "battery", "fsd", "autopilot", "engineer"]
+        fallback = []
+        for ts in timestamps:
+            topic_lower = ts["topic"].lower()
+            if any(term in topic_lower for term in BUSINESS_TERMS):
+                fallback.append({
+                    "timestamp": ts["timestamp"],
+                    "seconds": ts["seconds"],
+                    "topic": ts["topic"],
+                    "summary": f"Section covering {ts['topic']}",
+                    "company": "",
+                })
+        if fallback:
+            print(f"  Using {len(fallback)} keyword-matched timestamps as fallback")
+            return fallback
 
     return []
 
