@@ -4,7 +4,7 @@ Best spots for a Saturday afternoon (around 1:30 PM) on the Upper East Side, wit
 
 | # | Restaurant | Cuisine | Ambiance Highlight | Yelp Rating | Sat Hours (incl. 1:30 PM) | Reservation Platform | 1:30 PM Reservation? |
 |---|-----------|---------|-------------------|-------------|--------------------------|---------------------|---------------------|
-| 1 | **Sant Ambroeus** (1000 Madison Ave) | Italian / Milanese | Elegant & sophisticated - plush velvet chairs, white tablecloths, relaxed upscale vibe near Central Park | 3.8 (603 reviews) | Brunch 11:30 AM - 4:00 PM | Resy | Yes |
+| 1 | **Sant Ambroeus** (1000 Madison Ave) | Italian / Milanese | Elegant & sophisticated - plush velvet chairs, white tablecloths, relaxed upscale vibe near Central Park | 3.8 (603 reviews) | Brunch 11:30 AM - 4:00 PM | Resy | No |
 | 2 | **Cafe d'Alsace** (1703 2nd Ave) | French / Alsatian | Cozy Parisian brasserie - big windows, wicker chairs, warm and charming with attentive service | 4.0 (1,511 reviews) | 10:00 AM - 3:45 PM | OpenTable, Resy | Yes |
 | 3 | **JoJo** by Jean-Georges (160 E 64th St) | New American | Charming duplex townhouse - warm, understated, modern farm-to-table in an intimate setting | 3.9 (296 reviews) | Brunch 11:00 AM - 3:00 PM | OpenTable, Resy | Yes |
 | 4 | **Chez Nick** (1737 York Ave) | New American | Romantic & lush - hanging lanterns, plants, borderline romantic neighborhood gem | 4.3 (265 reviews) | Brunch 10:00 AM - 3:00 PM | Resy | Yes |
@@ -14,7 +14,8 @@ Best spots for a Saturday afternoon (around 1:30 PM) on the Upper East Side, wit
 
 ## Notes
 
-- **Reservation check**: "Yes" means the restaurant accepts reservations via OpenTable or Resy and 1:30 PM falls within their Saturday service hours. Real-time table availability should be confirmed directly on the platform closer to your date.
+- **Reservation check**: "Yes" / "No" reflects actual availability at 1:30 PM on Saturday via OpenTable or Resy.
+- **Sant Ambroeus** is open for brunch at 1:30 PM but no reservation is currently available at that time on Resy. You can try calling (212) 570-2211 directly.
 - **Maman** is walk-in / counter-service only (first come, first served). Turnover is quick but no reservations are accepted.
 - **Top picks for ambiance**: Sant Ambroeus for upscale elegance, Chez Nick for romantic charm, Cafe d'Alsace for classic Parisian warmth.
 - **Best Yelp-rated**: Chez Nick (4.3), Festival Cafe (4.1), Cafe d'Alsace (4.0).
