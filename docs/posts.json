@@ -1,20 +1,27 @@
 [
   {
-    "id": 2046598215047246263,
-    "text": "Falcon flies every few days. \n\nYou can see launches in person from Florida or California. https://t.co/TELC8mingg",
-    "summary": "Falcon flies every few days. You can see launches in person from Florida or California.",
-    "created_at": "Apr 21, 02:33 PM UTC",
-    "url": "https://x.com/elonmusk/status/2046598215047246263",
-    "retweets": 10386,
-    "likes": 88378,
-    "replies": 4186,
-    "impressions": 17947844,
-    "score": 127908,
-    "virality": "\ud83d\udd25 Viral",
-    "parent": null,
-    "ai_summary": "Elon Musk announces that SpaceX's Falcon rocket achieves a launch cadence of every few days, demonstrating significant operational scaling and manufacturing efficiency. The post highlights SpaceX's execution capability in rapidly iterating launches from multiple U.S. locations (Florida and California), which is a key business metric for space launch service providers and reflects progress toward the company's goal of frequent, routine space access.",
+    "id": 2047005617252978972,
+    "text": "@sundarpichai TPUs are underrated",
+    "summary": "@sundarpichai TPUs are underrated",
+    "created_at": "Apr 22, 05:32 PM UTC",
+    "url": "https://x.com/elonmusk/status/2047005617252978972",
+    "retweets": 365,
+    "likes": 6086,
+    "replies": 258,
+    "impressions": 355569,
+    "score": 7697,
+    "virality": "\ud83d\udcca Normal",
+    "parent": {
+      "id": 2046981627184902378,
+      "text": "TPU 8t, optimized for training and TPU 8i, optimized for inference. Looking good!",
+      "username": "sundarpichai",
+      "name": "Sundar Pichai",
+      "url": "https://x.com/sundarpichai/status/2046981627184902378",
+      "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">TPU 8t, optimized for training and TPU 8i, optimized for inference.<br><br>Looking good! <a href=\"https://t.co/pTrblfF8mU\">pic.twitter.com/pTrblfF8mU</a></p>&mdash; Sundar Pichai (@sundarpichai) <a href=\"https://twitter.com/sundarpichai/status/2046981627184902378?ref_src=twsrc%5Etfw\">April 22, 2026</a></blockquote>\n\n"
+    },
+    "ai_summary": "Sundar Pichai announced Google's new TPU 8t (optimized for training) and TPU 8i (optimized for inference) chips, representing advances in AI compute infrastructure. Elon Musk's reply acknowledging that TPUs are underrated highlights the critical importance of specialized hardware acceleration for AI/ML workloads\u2014a core competitive factor in the AI infrastructure race that directly impacts training efficiency and inference costs for companies building large language models and AI systems.",
     "is_relevant": true,
-    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Falcon flies every few days. <br><br>You can see launches in person from Florida or California. <a href=\"https://t.co/TELC8mingg\">https://t.co/TELC8mingg</a></p>&mdash; Elon Musk (@elonmusk) <a href=\"https://twitter.com/elonmusk/status/2046598215047246263?ref_src=twsrc%5Etfw\">April 21, 2026</a></blockquote>\n\n"
+    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">TPUs are underrated</p>&mdash; Elon Musk (@elonmusk) <a href=\"https://twitter.com/elonmusk/status/2047005617252978972?ref_src=twsrc%5Etfw\">April 22, 2026</a></blockquote>\n\n"
   },
   {
     "id": 2046858346569912408,
@@ -22,11 +29,11 @@
     "summary": "@aaronburnett 100TW of compute per year would be 200 times the US economy EVERY YEAR. Dollars won\u2019t even be used if we get to that point.",
     "created_at": "Apr 22, 07:47 AM UTC",
     "url": "https://x.com/elonmusk/status/2046858346569912408",
-    "retweets": 146,
-    "likes": 1518,
-    "replies": 236,
-    "impressions": 36496,
-    "score": 2428,
+    "retweets": 401,
+    "likes": 4641,
+    "replies": 374,
+    "impressions": 216858,
+    "score": 6592,
     "virality": "\ud83d\udcca Normal",
     "parent": {
       "id": 2046639596717658596,
@@ -36,7 +43,7 @@
       "url": "https://x.com/aaronburnett/status/2046639596717658596",
       "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Paying 6.6T for 100 Terawatts of Compute a year is...<br><br>1) an insane operational goal<br>2) almost 3 orders of magnitude less per GW than we pay for 1 GW of compute today. <br><br>Humans let alone investors cannot fathom this. <a href=\"https://t.co/J8xHh2OYsp\">https://t.co/J8xHh2OYsp</a></p>&mdash; Aaron Burnett (@aaronburnett) <a href=\"https://twitter.com/aaronburnett/status/2046639596717658596?ref_src=twsrc%5Etfw\">April 21, 2026</a></blockquote>\n\n"
     },
-    "ai_summary": "Aaron Burnett discusses the economics of achieving 100 Terawatts of compute annually for $6.6 trillion, noting this represents a 1,000x improvement in cost-efficiency per GW compared to today's compute pricing. Elon contextualizes the scale by noting 100TW annually would exceed US GDP by 200x, implying such compute abundance would fundamentally reshape economics and currency systems. This relates to xAI's infrastructure scaling ambitions and the broader AI compute buildout required to train and run advanced language models at planetary scale.",
+    "ai_summary": "Aaron Burnett highlights an ambitious compute infrastructure goal of 100 Terawatts annually for $6.6 trillion\u2014representing a dramatic 1000x improvement in cost-efficiency compared to current compute pricing\u2014while Elon contextualizes the scale by noting this would represent 200x US annual GDP, suggesting such transformative compute abundance could fundamentally reshape economics and currency systems. This relates to xAI's infrastructure scaling ambitions and the broader AI/ML compute demands required to train and run next-generation AI models at massive scale.",
     "is_relevant": true,
     "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">100TW of compute per year would be 200 times the US economy EVERY YEAR. <br><br>Dollars won\u2019t even be used if we get to that point.</p>&mdash; Elon Musk (@elonmusk) <a href=\"https://twitter.com/elonmusk/status/2046858346569912408?ref_src=twsrc%5Etfw\">April 22, 2026</a></blockquote>\n\n"
   }
