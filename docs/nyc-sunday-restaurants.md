@@ -1,45 +1,28 @@
-# NYC Sunday Afternoon / Evening Spots — Great Food + Vibe
+# NYC Sunday Dinner — Vegetarian-Friendly + Reservation Available
 
-Curated based on Reddit frequency of mentions and profusive praise across r/FoodNYC, r/AskNYC, and r/nyc, plus corroborating coverage from The Infatuation, Resy, Time Out, and Eater.
+Filtered from the original 20 to only restaurants that meet **both** criteria:
+1. **More than 5 vegetarian dishes** on the current menu
+2. **Take reservations** on Resy or OpenTable (so a 5:30 / 5:45 PM slot can be checked online)
 
-> **Note on reservations & Yelp ratings:** Public Resy/OpenTable/Yelp APIs are gated behind auth, so this table links each restaurant's reservation page directly — clicking will show 5 PM availability for today. Yelp ratings are pulled from publicly indexed Yelp listings; click through any "Yelp ↗" link to confirm latest stars. **Llama San** (closed mid-2025) and **Llama Inn** (currently flagged closed on Yelp) replaced with **Don Angie**.
+> **Honest caveat:** I cannot query live Resy/OpenTable availability — those endpoints are auth-gated. Links go directly to each restaurant's booking page; one click shows live 5:30/5:45 PM slots.
 
-| # | Restaurant | Neighborhood | Cuisine | Vibe / Ambiance | Why Reddit Raves | Best For (Sun PM) | Reservation Platform | Book / Check 5 PM Today | Yelp Rating |
-|---|---|---|---|---|---|---|---|---|---|
-| 1 | Via Carota | West Village | Rustic Italian | Candlelit, copper pans, warm wood | Most-mentioned spot on r/FoodNYC; walk-in only — Sun afternoon doable | Late lunch / early dinner | **Walk-in only** (very limited Resy) | [Resy ↗](https://resy.com/cities/new-york-ny/venues/via-carota) | ~4.4★ ([Yelp ↗](https://www.yelp.com/biz/via-carota-new-york-4)) |
-| 2 | Lilia | Williamsburg | N. Italian | Airy converted auto-body shop, golden-hour light | Reservation grail; agnolotti + focaccia universally praised | Sunday dinner | **Resy** (drops 30 days out, 10 AM) | [Resy ↗](https://resy.com/cities/ny/lilia) · [OpenTable ↗](https://www.opentable.com/r/lilia-brooklyn) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/lilia-brooklyn)) |
-| 3 | Raoul's | SoHo | French Bistro | Dim, sultry, tin ceilings — "effortlessly romantic" | Cited as the platonic NYC bistro; legendary au poivre burger | Lingering dinner | **Resy** (drops 30 days, 8 AM) | [Resy ↗](https://resy.com/cities/ny/raouls) | 4.4★ ([Yelp ↗](https://www.yelp.com/biz/raouls-restaurant-new-york)) |
-| 4 | Maison Premiere | Williamsburg | Oysters/Cocktails | Belle Époque, lush hidden backyard, absinthe fountain | Heavy love for $1 oyster happy hour + the courtyard | Sunny afternoon oysters | **Resy** (+ walk-in bar) | [Resy ↗](https://resy.com/cities/new-york-ny/venues/maison-premiere) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/maison-premiere-brooklyn)) |
-| 5 | Semma | West Village | South Indian | Tropical greens, low warm lighting | NYT #1 in NYC; Michelin star; "most exciting Indian food in America" | Buzzy dinner | **Resy** (drops 14 days, 9 AM); 12 walk-in bar seats from 5 PM | [Resy ↗](https://resy.com/cities/new-york-ny/venues/semma) | ~4.6★ ([Yelp ↗](https://www.yelp.com/biz/semma-new-york-2)) |
-| 6 | Dhamaka | LES (Essex Mkt) | Regional Indian | Electric, loud, deep red lighting | Constantly debated and praised; "every dish hits" | Fun group dinner | **Resy** (drops 30 days, midnight) + Notify list | [Resy ↗](https://resy.com/cities/new-york-ny/venues/dhamaka) | 4.1★ ([Yelp ↗](https://www.yelp.com/biz/dhamaka-new-york)) |
-| 7 | Don Angie | West Village | Italian-American | Mirror-clad, sexy, cozy banquettes | Reddit darling for pinwheel lasagna; date-night staple | Romantic dinner | **Resy** (drops 30 days, 10 AM) | [Resy ↗](https://resy.com/cities/ny/don-angie) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/don-angie-new-york)) |
-| 8 | Cosme | Flatiron | Modern Mexican | Terracotta tones, sophisticated buzz | Husk meringue is one of the most-posted dishes on Reddit | Special-occasion dinner | **Resy / OpenTable** | [Resy ↗](https://resy.com/cities/ny/cosme) · [OpenTable ↗](https://www.opentable.com/r/cosme-new-york) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/cosme-new-york)) |
-| 9 | Frenchette | Tribeca | French Brasserie | Art-deco brass, leather banquettes, golden glow | "Best brasserie energy in NYC" — repeated Reddit refrain | Elevated dinner | **Resy / OpenTable** (4.6★ OT) | [Resy ↗](https://resy.com/cities/ny/frenchette) · [OpenTable ↗](https://www.opentable.com/r/frenchette-new-york) | ~4.3★ ([Yelp ↗](https://www.yelp.com/biz/frenchette-new-york-2)) |
-| 10 | Le Coucou | Soho | Refined French | Soaring ceilings, candelabras, white tablecloth | "Prettiest dining room in Manhattan" | Splurge night | **Resy** | [Resy ↗](https://resy.com/cities/new-york-ny/venues/le-coucou) | 4.5★ ([Yelp ↗](https://www.yelp.com/biz/le-coucou-new-york)) |
-| 11 | San Sabino | West Village | Italian Seafood | Understated elegance (Don Angie team) | Recent Reddit darling; Sunday Sauce highly recommended | Sunday Italian classic | **OpenTable** (moved off Resy May 2025; drops 30 days, 9 AM) | [OpenTable ↗](https://www.opentable.com/r/san-sabino-new-york) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/san-sabino-new-york-2)) |
-| 12 | Crevette | West Village | Coastal Spanish/French | Sunny sidewalk patio, Mediterranean breezy | Sunday lunch service consistently praised | Patio afternoon lunch | **Resy** | [Resy ↗](https://resy.com/cities/ny/crevette) | 4.5★ ([Yelp ↗](https://www.yelp.com/biz/crevette-new-york)) |
-| 13 | Vinegar Hill House | Vinegar Hill, BK | New American | Cabin-cozy, fireplace, cobblestone street | "Like a woodland creature's lodge"; cast-iron chicken | Cozy off-radar dinner | **Resy / OpenTable** | [Resy ↗](https://resy.com/cities/new-york-ny/venues/vinegar-hill-house) · [OpenTable ↗](https://www.opentable.com/r/vinegar-hill-house) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/vinegar-hill-house-brooklyn)) |
-| 14 | Al Di La Trattoria | Park Slope | N. Italian | Mismatched chandeliers, church-pew seating | Reddit's go-to "old-school cozy" answer | Long slow dinner | **No reservations — walk-in** (or wine bar next door) | [Site ↗](https://www.aldilatrattoria.com/) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/al-di-la-trattoria-brooklyn)) |
-| 15 | Red Rooster | Harlem | Soulful American | Vibrant art, live jazz/gospel | Most-recommended Harlem Sunday brunch | Gospel Brunch | **OpenTable** (4.7★ OT, 10k+ reviews) | [OpenTable ↗](https://www.opentable.com/r/red-rooster-harlem-new-york) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/red-rooster-harlem-new-york-3)) |
-| 16 | Loulou | Chelsea | French | Floral installations, glowing lanterns | Frequent "prettiest room" shoutout | Romantic afternoon | **Resy / OpenTable** (4.5★ OT) | [Resy ↗](https://resy.com/cities/ny/loulou-petit-bistro-and-speakeasy) · [OpenTable ↗](https://www.opentable.com/r/loulou-new-york) | ~4.3★ ([Yelp ↗](https://www.yelp.com/biz/loulou-petit-bistro-and-speakeasy-new-york)) |
-| 17 | Veselka | East Village | Ukrainian Diner | Classic, scuffed, beloved | Most-mentioned diner on r/AskNYC; pierogi + borscht | Hangover Sunday lunch | **Walk-in only** (24/7) | [Site ↗](https://veselka.com/) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/veselka-new-york)) |
-| 18 | HaSalon | Hell's Kitchen | Israeli | Loud, table-dancing, Eyal Shani party energy | Polarizing but huge love for the energy + tomatoes | Late raucous dinner | **Resy / OpenTable** (Thu–Sat only — likely closed Sun) | [Resy ↗](https://resy.com/cities/ny/hasalon-nyc) · [OpenTable ↗](https://www.opentable.com/r/hasalon-nyc-new-york) | ~3.8★ ([Yelp ↗](https://www.yelp.com/biz/hasalon-new-york)) |
-| 19 | Manhatta | FiDi | New American | 60th-floor skyline views, golden-hour magic | Top "great vibe + view" Reddit pick | Sunset cocktails + dinner | **Resy** | [Resy ↗](https://resy.com/cities/ny/manhatta) | 4.5★ ([Yelp ↗](https://www.yelp.com/biz/manhatta-new-york)) |
-| 20 | Jack's Wife Freda | SoHo / W Village / Chelsea | Mediterranean Café | Bright, breezy, neighborhood-y | Reddit's brunch easy-button — "always a good time" | Walk-in Sunday brunch | **Resy** (multiple locations); walk-ins welcome | [Resy SoHo ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda) · [Chelsea ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-chelsea) · [W Village ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-west-village) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/jacks-wife-freda-new-york)) |
+## Eliminated and why
 
-## How to actually grab a 5 PM table today
+- **Walk-in only / no reservations:** Via Carota, Veselka, Al Di La (cannot pre-book a 5:30/5:45)
+- **Closed Sundays:** HaSalon (Thu–Sat only)
+- **≤5 vegetarian dishes on menu:** Raoul's, Maison Premiere, Frenchette, Le Coucou, San Sabino, Crevette, Vinegar Hill House, Red Rooster, Don Angie, Cosme, Manhatta, Loulou
 
-1. **Easiest:** open the Resy/OpenTable links above on mobile — last-minute Sunday cancellations are common 1–3 hours before service.
-2. **Walk-ins to try right now:** Via Carota (queue forms ~4:45 PM), Veselka (no wait, ever), Al Di La (or wine bar next door), Maison Premiere oyster bar, Semma's 12 bar seats at 5 PM.
-3. **Notify lists** on Resy work surprisingly well for Lilia, Dhamaka, Semma — set notifications for Sunday 5–7 PM and refresh.
-4. **Best 5 PM odds today (Sunday):** Manhatta, Frenchette, Loulou, Crevette, Vinegar Hill House, Red Rooster, San Sabino — all typically have early-evening Sun availability.
-5. **Skip today:** HaSalon (Thu–Sat only).
+## The shortlist
 
-## Quick picks by mood
+| # | Restaurant | Neighborhood | Cuisine | Veg dishes (counted) | Vibe / Why Reddit Raves | Reservation | Book / Check 5:30–5:45 PM | Yelp |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **Semma** | West Village | South Indian | **8+** — Gunpowder Dosa, Paniyaram, Uttappam, Mirchi Ka Salan, Uzhavar Santhai Poriyal, Gutti Vankaya, Idiyappam, plus dals | Tropical greens + warm low light; NYT #1 in NYC, Michelin star | Resy + Notify list | [Resy ↗](https://resy.com/cities/new-york-ny/venues/semma) | ~4.6★ |
+| 2 | **Dhamaka** | LES (Essex Market) | Regional Indian | **6+** — Papdi Chaat, Beguni, Ragda Pattice, Ajwani Paneer Tikka, Paneer Nawabi Korma, Lasooni Palak | Electric, loud, deep red lighting; "every dish hits" per Reddit | Resy + Notify list | [Resy ↗](https://resy.com/cities/new-york-ny/venues/dhamaka) | 4.1★ |
+| 3 | **Lilia** | Williamsburg | N. Italian | **~5–6** — Corzetti w/ Chanterelles, Spaghetti al Limone, Mafaldini cacio e pepe, Broccolini, Carrots, seasonal verdure | Airy auto-body conversion w/ golden-hour light | Resy / OpenTable | [Resy ↗](https://resy.com/cities/ny/lilia) · [OpenTable ↗](https://www.opentable.com/r/lilia-brooklyn) | ~4.5★ |
+| 4 | **Jack's Wife Freda** | SoHo / W Village / Chelsea | Mediterranean Café | **7+** — Green Shakshuka, Veggie Burger, Quinoa Salad, Mediterranean Breakfast, Rosewater Waffle, Hummus, avocado toast | Bright, breezy; Reddit's brunch easy-button | Resy + walk-ins | [SoHo ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda) · [Chelsea ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-chelsea) · [W Village ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-west-village) | ~4.0★ |
 
-- **Cozy + romantic:** Via Carota, Raoul's, Vinegar Hill House, Al Di La, Don Angie
-- **Sunny afternoon patio:** Crevette, Maison Premiere (backyard), Loulou
-- **Buzzy / loud / fun:** Dhamaka, HaSalon, Semma, Lilia
-- **View / golden-hour:** Manhatta
-- **Brunch with live music:** Red Rooster (jazz/gospel)
-- **Walk-in friendly Sunday afternoon:** Veselka, Jack's Wife Freda, Crevette, Via Carota (early), Al Di La
+## Odds for 5:30 / 5:45 today
+
+- **Best chance:** Jack's Wife Freda — walk-in friendly, three locations.
+- **Long shot via Notify:** Lilia, Semma, Dhamaka — turn on Resy Notify for the 5:30–6 PM window; last-min Sunday cancellations are common.
+- **Fallback:** widen to 5:00 or 6:00 — most Sunday slots open in those bands.
