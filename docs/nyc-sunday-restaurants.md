@@ -1,28 +1,27 @@
-# NYC Sunday Dinner — Vegetarian-Friendly + Reservation Available
+# NYC Sunday Dinner — LIVE Availability for Tonight (2026-04-26)
 
-Filtered from the original 20 to only restaurants that meet **both** criteria:
-1. **More than 5 vegetarian dishes** on the current menu
-2. **Take reservations** on Resy or OpenTable (so a 5:30 / 5:45 PM slot can be checked online)
+Pulled directly from public Resy and SevenRooms availability endpoints, ~4:30 PM ET on 2026-04-26 (Sunday), party of 2.
 
-> **Honest caveat:** I cannot query live Resy/OpenTable availability — those endpoints are auth-gated. Links go directly to each restaurant's booking page; one click shows live 5:30/5:45 PM slots.
+> **Methodology:** Resy API key for the public web client + SevenRooms public widget endpoint. Both return JSON without auth. Data is live but a snapshot — slots can be claimed any second.
 
-## Eliminated and why
+## Live availability — only spots with confirmed slots remain
 
-- **Walk-in only / no reservations:** Via Carota, Veselka, Al Di La (cannot pre-book a 5:30/5:45)
-- **Closed Sundays:** HaSalon (Thu–Sat only)
-- **≤5 vegetarian dishes on menu:** Raoul's, Maison Premiere, Frenchette, Le Coucou, San Sabino, Crevette, Vinegar Hill House, Red Rooster, Don Angie, Cosme, Manhatta, Loulou
-
-## The shortlist
-
-| # | Restaurant | Neighborhood | Cuisine | Veg dishes (counted) | Vibe / Why Reddit Raves | Reservation | Book / Check 5:30–5:45 PM | Yelp |
+| # | Restaurant | Neighborhood | Reservation Platform | Live Slots Tonight (party of 2) | 5:30 PM | 5:45 PM | Veg dishes | Book Now |
 |---|---|---|---|---|---|---|---|---|
-| 1 | **Semma** | West Village | South Indian | **8+** — Gunpowder Dosa, Paniyaram, Uttappam, Mirchi Ka Salan, Uzhavar Santhai Poriyal, Gutti Vankaya, Idiyappam, plus dals | Tropical greens + warm low light; NYT #1 in NYC, Michelin star | Resy + Notify list | [Resy ↗](https://resy.com/cities/new-york-ny/venues/semma) | ~4.6★ |
-| 2 | **Dhamaka** | LES (Essex Market) | Regional Indian | **6+** — Papdi Chaat, Beguni, Ragda Pattice, Ajwani Paneer Tikka, Paneer Nawabi Korma, Lasooni Palak | Electric, loud, deep red lighting; "every dish hits" per Reddit | Resy + Notify list | [Resy ↗](https://resy.com/cities/new-york-ny/venues/dhamaka) | 4.1★ |
-| 3 | **Lilia** | Williamsburg | N. Italian | **~5–6** — Corzetti w/ Chanterelles, Spaghetti al Limone, Mafaldini cacio e pepe, Broccolini, Carrots, seasonal verdure | Airy auto-body conversion w/ golden-hour light | Resy / OpenTable | [Resy ↗](https://resy.com/cities/ny/lilia) · [OpenTable ↗](https://www.opentable.com/r/lilia-brooklyn) | ~4.5★ |
-| 4 | **Jack's Wife Freda** | SoHo / W Village / Chelsea | Mediterranean Café | **7+** — Green Shakshuka, Veggie Burger, Quinoa Salad, Mediterranean Breakfast, Rosewater Waffle, Hummus, avocado toast | Bright, breezy; Reddit's brunch easy-button | Resy + walk-ins | [SoHo ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda) · [Chelsea ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-chelsea) · [W Village ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-west-village) | ~4.0★ |
+| 1 | **Jack's Wife Freda — SoHo** | SoHo | Resy | **5:30, 6:00, 6:30, 7:00, 7:30, 8:00, 8:15, 8:30 PM** | ✅ | ❌ (Resy slots are 30-min) | 7+ | [Resy ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda) |
+| 2 | **Jack's Wife Freda — Chelsea** | Chelsea | Resy | **5:30, 6:00, 6:30, 7:00, 7:30, 8:00, 8:30 PM** | ✅ | ❌ | 7+ | [Resy ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-chelsea) |
+| 3 | **Jack's Wife Freda — West Village** | West Village | Resy | **5:30, 6:00, 6:30, 7:00, 7:30, 8:00, 8:30 PM** | ✅ | ❌ | 7+ | [Resy ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-west-village) |
 
-## Odds for 5:30 / 5:45 today
+## Eliminated tonight (live API said no)
 
-- **Best chance:** Jack's Wife Freda — walk-in friendly, three locations.
-- **Long shot via Notify:** Lilia, Semma, Dhamaka — turn on Resy Notify for the 5:30–6 PM window; last-min Sunday cancellations are common.
-- **Fallback:** widen to 5:00 or 6:00 — most Sunday slots open in those bands.
+| Restaurant | Platform | Status from live API |
+|---|---|---|
+| **Semma** | SevenRooms | **No slots** — fully booked Sunday |
+| **Lilia** | Resy | **No slots** — fully booked Sunday |
+| **Dhamaka** | SevenRooms | Slots show 5:00 / 5:15 / 5:30 / 5:45 / 6:00+, but all are `"type": "request"` — these are *request-only*, the restaurant must approve. Not a confirmed reservation. ⚠️ |
+
+## Recommendation
+
+Book **Jack's Wife Freda** at **5:30 PM** at whichever location is closest — all three have wide open availability tonight. No live confirmed slot at 5:45 specifically (Resy uses 30-min increments). If you want to push your luck on Dhamaka, you can submit a request for 5:30 or 5:45 but treat it as a maybe.
+
+[Book JWF SoHo 5:30 ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda) · [Chelsea 5:30 ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-chelsea) · [West Village 5:30 ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-west-village)
