@@ -2,40 +2,44 @@
 
 Curated based on Reddit frequency of mentions and profusive praise across r/FoodNYC, r/AskNYC, and r/nyc, plus corroborating coverage from The Infatuation, Resy, Time Out, and Eater.
 
-| # | Restaurant | Neighborhood | Cuisine | Vibe / Ambiance | Why Reddit Raves | Best For (Sun PM) |
-|---|---|---|---|---|---|---|
-| 1 | Via Carota | West Village | Rustic Italian | Candlelit, no-frills cozy, copper pans, warm wood | One of the most-mentioned restaurants on r/FoodNYC; "perfect Sunday spot," walk-in only so weekday-Sunday afternoons are doable | Late lunch / early dinner |
-| 2 | Lilia | Williamsburg | Northern Italian | Airy converted auto-body shop, golden-hour light through clerestory windows | A decade later still a top-mentioned reservation grail; agnolotti and focaccia near-universally praised | Sunday dinner (book 30 days out) |
-| 3 | Raoul's | SoHo | French Bistro | Dim, sultry, tin ceilings, vintage prints — "effortlessly romantic" | Frequently cited as the platonic ideal of an NYC bistro; legendary au poivre burger | Late, lingering dinner |
-| 4 | Maison Premiere | Williamsburg | Oysters & Cocktails | Belle Époque interior, lush hidden backyard, absinthe fountain | Heavy Reddit love for the oyster happy hour and the courtyard; "feels like New Orleans" | Sunny afternoon oysters + Sazeracs |
-| 5 | Semma | West Village | South Indian | Tropical greens, warm low lighting, intimate but lively | NYT #1 in NYC; r/FoodNYC calls it "the most exciting Indian food in America" | Buzzy Sunday dinner |
-| 6 | Dhamaka | Lower East Side (Essex Mkt) | Regional Indian | Electric, loud, deep red lighting | Constantly debated and praised; "every dish hits" | Loud, fun group dinner |
-| 7 | Llama San | Greenwich Village | Nikkei (Peruvian-Japanese) | Subterranean, moody, candlelit | Frequent r/AskNYC date-night pick; tiraditos universally praised | Quiet, romantic dinner |
-| 8 | Cosme | Flatiron | Modern Mexican | High-ceiling, terracotta tones, sophisticated buzz | Husk meringue dessert is one of the most-posted dishes on Reddit NYC | Special-occasion dinner |
-| 9 | Frenchette | Tribeca | French Brasserie | Art-deco brass, leather banquettes, golden glow | "Best brasserie energy in NYC" — repeated Reddit refrain | Elevated Sunday dinner |
-| 10 | Le Coucou | Soho | Refined French | Soaring ceilings, candelabras, white-tablecloth romance | Praised as "the prettiest dining room in Manhattan" | Splurge / anniversary |
-| 11 | San Sabino | West Village | Italian Seafood | Understated elegance from the Don Angie team | New 2024 darling on Reddit; Sunday Sauce night highly recommended | Sunday Italian classic |
-| 12 | Crevette | West Village | Coastal Spanish/French | Sunny sidewalk patio, breezy, Mediterranean | Sunday lunch service is a stand-out per Resy + Reddit | Afternoon patio lunch |
-| 13 | Vinegar Hill House | Vinegar Hill, BK | New American | Cabin-cozy, candlelit, fireplace, hidden cobblestone street | "Like a woodland creature's lodge"; cast-iron chicken praised endlessly | Cozy, off-the-radar Sunday dinner |
-| 14 | Al Di La Trattoria | Park Slope | Northern Italian | Mismatched chandeliers, church-pew seating, wine-soaked warmth | Reddit's go-to "old-school cozy" answer; malfatti is a recurring favorite | Long, slow Sunday dinner |
-| 15 | Red Rooster | Harlem | Soulful American | Vibrant art, live jazz/gospel during brunch | Marcus Samuelsson's spot — most-recommended Harlem Sunday brunch on Reddit | Sunday Gospel Brunch |
-| 16 | Loulou | Chelsea | French | Floral installations, glowing lanterns, garden-greenhouse feel | Frequent "prettiest dining room" Reddit shoutout | Romantic afternoon |
-| 17 | Veselka | East Village | Ukrainian Diner | Classic, scuffed, beloved; the "great NYC equalizer" | The single most-mentioned diner on r/AskNYC; pierogi and borscht praised universally | Hangover Sunday lunch |
-| 18 | HaSalon | Hell's Kitchen | Israeli | Loud, table-dancing, Eyal Shani party energy | Polarizing but huge Reddit love for the energy and tomatoes | Late, raucous Sunday dinner |
-| 19 | Manhatta | FiDi | New American | 60th-floor sweeping skyline views, golden hour magic | Reddit's top "great-vibe-with-a-view" recommendation | Sunset cocktails + dinner |
-| 20 | Jack's Wife Freda | SoHo / W Village | Mediterranean Café | Bright, breezy, neighborhood-y | Reddit's brunch easy-button — "always a good time" | Walk-in Sunday brunch |
+> **Note on reservations & Yelp ratings:** Public Resy/OpenTable/Yelp APIs are gated behind auth, so this table links each restaurant's reservation page directly — clicking will show 5 PM availability for today. Yelp ratings are pulled from publicly indexed Yelp listings; click through any "Yelp ↗" link to confirm latest stars. **Llama San** (closed mid-2025) and **Llama Inn** (currently flagged closed on Yelp) replaced with **Don Angie**.
+
+| # | Restaurant | Neighborhood | Cuisine | Vibe / Ambiance | Why Reddit Raves | Best For (Sun PM) | Reservation Platform | Book / Check 5 PM Today | Yelp Rating |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | Via Carota | West Village | Rustic Italian | Candlelit, copper pans, warm wood | Most-mentioned spot on r/FoodNYC; walk-in only — Sun afternoon doable | Late lunch / early dinner | **Walk-in only** (very limited Resy) | [Resy ↗](https://resy.com/cities/new-york-ny/venues/via-carota) | ~4.4★ ([Yelp ↗](https://www.yelp.com/biz/via-carota-new-york-4)) |
+| 2 | Lilia | Williamsburg | N. Italian | Airy converted auto-body shop, golden-hour light | Reservation grail; agnolotti + focaccia universally praised | Sunday dinner | **Resy** (drops 30 days out, 10 AM) | [Resy ↗](https://resy.com/cities/ny/lilia) · [OpenTable ↗](https://www.opentable.com/r/lilia-brooklyn) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/lilia-brooklyn)) |
+| 3 | Raoul's | SoHo | French Bistro | Dim, sultry, tin ceilings — "effortlessly romantic" | Cited as the platonic NYC bistro; legendary au poivre burger | Lingering dinner | **Resy** (drops 30 days, 8 AM) | [Resy ↗](https://resy.com/cities/ny/raouls) | 4.4★ ([Yelp ↗](https://www.yelp.com/biz/raouls-restaurant-new-york)) |
+| 4 | Maison Premiere | Williamsburg | Oysters/Cocktails | Belle Époque, lush hidden backyard, absinthe fountain | Heavy love for $1 oyster happy hour + the courtyard | Sunny afternoon oysters | **Resy** (+ walk-in bar) | [Resy ↗](https://resy.com/cities/new-york-ny/venues/maison-premiere) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/maison-premiere-brooklyn)) |
+| 5 | Semma | West Village | South Indian | Tropical greens, low warm lighting | NYT #1 in NYC; Michelin star; "most exciting Indian food in America" | Buzzy dinner | **Resy** (drops 14 days, 9 AM); 12 walk-in bar seats from 5 PM | [Resy ↗](https://resy.com/cities/new-york-ny/venues/semma) | ~4.6★ ([Yelp ↗](https://www.yelp.com/biz/semma-new-york-2)) |
+| 6 | Dhamaka | LES (Essex Mkt) | Regional Indian | Electric, loud, deep red lighting | Constantly debated and praised; "every dish hits" | Fun group dinner | **Resy** (drops 30 days, midnight) + Notify list | [Resy ↗](https://resy.com/cities/new-york-ny/venues/dhamaka) | 4.1★ ([Yelp ↗](https://www.yelp.com/biz/dhamaka-new-york)) |
+| 7 | Don Angie | West Village | Italian-American | Mirror-clad, sexy, cozy banquettes | Reddit darling for pinwheel lasagna; date-night staple | Romantic dinner | **Resy** (drops 30 days, 10 AM) | [Resy ↗](https://resy.com/cities/ny/don-angie) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/don-angie-new-york)) |
+| 8 | Cosme | Flatiron | Modern Mexican | Terracotta tones, sophisticated buzz | Husk meringue is one of the most-posted dishes on Reddit | Special-occasion dinner | **Resy / OpenTable** | [Resy ↗](https://resy.com/cities/ny/cosme) · [OpenTable ↗](https://www.opentable.com/r/cosme-new-york) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/cosme-new-york)) |
+| 9 | Frenchette | Tribeca | French Brasserie | Art-deco brass, leather banquettes, golden glow | "Best brasserie energy in NYC" — repeated Reddit refrain | Elevated dinner | **Resy / OpenTable** (4.6★ OT) | [Resy ↗](https://resy.com/cities/ny/frenchette) · [OpenTable ↗](https://www.opentable.com/r/frenchette-new-york) | ~4.3★ ([Yelp ↗](https://www.yelp.com/biz/frenchette-new-york-2)) |
+| 10 | Le Coucou | Soho | Refined French | Soaring ceilings, candelabras, white tablecloth | "Prettiest dining room in Manhattan" | Splurge night | **Resy** | [Resy ↗](https://resy.com/cities/new-york-ny/venues/le-coucou) | 4.5★ ([Yelp ↗](https://www.yelp.com/biz/le-coucou-new-york)) |
+| 11 | San Sabino | West Village | Italian Seafood | Understated elegance (Don Angie team) | Recent Reddit darling; Sunday Sauce highly recommended | Sunday Italian classic | **OpenTable** (moved off Resy May 2025; drops 30 days, 9 AM) | [OpenTable ↗](https://www.opentable.com/r/san-sabino-new-york) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/san-sabino-new-york-2)) |
+| 12 | Crevette | West Village | Coastal Spanish/French | Sunny sidewalk patio, Mediterranean breezy | Sunday lunch service consistently praised | Patio afternoon lunch | **Resy** | [Resy ↗](https://resy.com/cities/ny/crevette) | 4.5★ ([Yelp ↗](https://www.yelp.com/biz/crevette-new-york)) |
+| 13 | Vinegar Hill House | Vinegar Hill, BK | New American | Cabin-cozy, fireplace, cobblestone street | "Like a woodland creature's lodge"; cast-iron chicken | Cozy off-radar dinner | **Resy / OpenTable** | [Resy ↗](https://resy.com/cities/new-york-ny/venues/vinegar-hill-house) · [OpenTable ↗](https://www.opentable.com/r/vinegar-hill-house) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/vinegar-hill-house-brooklyn)) |
+| 14 | Al Di La Trattoria | Park Slope | N. Italian | Mismatched chandeliers, church-pew seating | Reddit's go-to "old-school cozy" answer | Long slow dinner | **No reservations — walk-in** (or wine bar next door) | [Site ↗](https://www.aldilatrattoria.com/) | ~4.5★ ([Yelp ↗](https://www.yelp.com/biz/al-di-la-trattoria-brooklyn)) |
+| 15 | Red Rooster | Harlem | Soulful American | Vibrant art, live jazz/gospel | Most-recommended Harlem Sunday brunch | Gospel Brunch | **OpenTable** (4.7★ OT, 10k+ reviews) | [OpenTable ↗](https://www.opentable.com/r/red-rooster-harlem-new-york) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/red-rooster-harlem-new-york-3)) |
+| 16 | Loulou | Chelsea | French | Floral installations, glowing lanterns | Frequent "prettiest room" shoutout | Romantic afternoon | **Resy / OpenTable** (4.5★ OT) | [Resy ↗](https://resy.com/cities/ny/loulou-petit-bistro-and-speakeasy) · [OpenTable ↗](https://www.opentable.com/r/loulou-new-york) | ~4.3★ ([Yelp ↗](https://www.yelp.com/biz/loulou-petit-bistro-and-speakeasy-new-york)) |
+| 17 | Veselka | East Village | Ukrainian Diner | Classic, scuffed, beloved | Most-mentioned diner on r/AskNYC; pierogi + borscht | Hangover Sunday lunch | **Walk-in only** (24/7) | [Site ↗](https://veselka.com/) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/veselka-new-york)) |
+| 18 | HaSalon | Hell's Kitchen | Israeli | Loud, table-dancing, Eyal Shani party energy | Polarizing but huge love for the energy + tomatoes | Late raucous dinner | **Resy / OpenTable** (Thu–Sat only — likely closed Sun) | [Resy ↗](https://resy.com/cities/ny/hasalon-nyc) · [OpenTable ↗](https://www.opentable.com/r/hasalon-nyc-new-york) | ~3.8★ ([Yelp ↗](https://www.yelp.com/biz/hasalon-new-york)) |
+| 19 | Manhatta | FiDi | New American | 60th-floor skyline views, golden-hour magic | Top "great vibe + view" Reddit pick | Sunset cocktails + dinner | **Resy** | [Resy ↗](https://resy.com/cities/ny/manhatta) | 4.5★ ([Yelp ↗](https://www.yelp.com/biz/manhatta-new-york)) |
+| 20 | Jack's Wife Freda | SoHo / W Village / Chelsea | Mediterranean Café | Bright, breezy, neighborhood-y | Reddit's brunch easy-button — "always a good time" | Walk-in Sunday brunch | **Resy** (multiple locations); walk-ins welcome | [Resy SoHo ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda) · [Chelsea ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-chelsea) · [W Village ↗](https://resy.com/cities/new-york-ny/venues/jacks-wife-freda-west-village) | ~4.0★ ([Yelp ↗](https://www.yelp.com/biz/jacks-wife-freda-new-york)) |
+
+## How to actually grab a 5 PM table today
+
+1. **Easiest:** open the Resy/OpenTable links above on mobile — last-minute Sunday cancellations are common 1–3 hours before service.
+2. **Walk-ins to try right now:** Via Carota (queue forms ~4:45 PM), Veselka (no wait, ever), Al Di La (or wine bar next door), Maison Premiere oyster bar, Semma's 12 bar seats at 5 PM.
+3. **Notify lists** on Resy work surprisingly well for Lilia, Dhamaka, Semma — set notifications for Sunday 5–7 PM and refresh.
+4. **Best 5 PM odds today (Sunday):** Manhatta, Frenchette, Loulou, Crevette, Vinegar Hill House, Red Rooster, San Sabino — all typically have early-evening Sun availability.
+5. **Skip today:** HaSalon (Thu–Sat only).
 
 ## Quick picks by mood
 
-- **Cozy + romantic:** Via Carota, Raoul's, Vinegar Hill House, Al Di La, Llama San
+- **Cozy + romantic:** Via Carota, Raoul's, Vinegar Hill House, Al Di La, Don Angie
 - **Sunny afternoon patio:** Crevette, Maison Premiere (backyard), Loulou
 - **Buzzy / loud / fun:** Dhamaka, HaSalon, Semma, Lilia
 - **View / golden-hour:** Manhatta
-- **Brunch with live music:** Red Rooster (jazz/gospel), Café Carmellini (jazz champagne brunch)
-- **Walk-in friendly Sunday afternoon:** Veselka, Jack's Wife Freda, Crevette, Via Carota (early)
-
-## Reservation tips
-
-- **Resy drops at 9 AM** for Lilia, Via Carota, Semma, Dhamaka — set a calendar reminder.
-- For walk-ins: **arrive at opening** (5–5:30 PM Sunday) at Via Carota, Raoul's bar, Maison Premiere bar.
-- Sundays tend to be slightly easier than Fri/Sat at most of the above.
+- **Brunch with live music:** Red Rooster (jazz/gospel)
+- **Walk-in friendly Sunday afternoon:** Veselka, Jack's Wife Freda, Crevette, Via Carota (early), Al Di La
