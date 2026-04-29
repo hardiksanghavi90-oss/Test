@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": 2049372702235136447,
+    "text": "@CARN0N Optimus 3 is special",
+    "summary": "@CARN0N Optimus 3 is special",
+    "created_at": "Apr 29, 06:18 AM UTC",
+    "url": "https://x.com/elonmusk/status/2049372702235136447",
+    "retweets": 354,
+    "likes": 4876,
+    "replies": 473,
+    "impressions": 131538,
+    "score": 6884,
+    "virality": "\ud83d\udcca Normal",
+    "parent": {
+      "id": 2049099179428032591,
+      "text": "Elon during the Q1 2026 earnings call: \"When we've unveiled various Optimus versions, we've found out our competitors literally do a frame-by-frame analysis and copy everything we're doing.\" Exhibit A. Xiaomi's Cyber One V2, revealed today, next to Tesla's Optimus Gen 2 - which",
+      "username": "CARN0N",
+      "name": "Oli",
+      "url": "https://x.com/CARN0N/status/2049099179428032591",
+      "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Elon during the Q1 2026 earnings call:<br>&quot;When we&#39;ve unveiled various Optimus versions, we&#39;ve found out our competitors literally do a frame-by-frame analysis and copy everything we&#39;re doing.&quot;<br><br>Exhibit A.<br><br>Xiaomi&#39;s Cyber One V2, revealed today, next to Tesla&#39;s Optimus Gen 2 - which\u2026 <a href=\"https://t.co/Bzp2rlQaPo\">pic.twitter.com/Bzp2rlQaPo</a></p>&mdash; Oli (@CARN0N) <a href=\"https://twitter.com/CARN0N/status/2049099179428032591?ref_src=twsrc%5Etfw\">April 28, 2026</a></blockquote>\n\n"
+    },
+    "ai_summary": "A user highlights that competitors are copying Tesla's Optimus humanoid robot design by comparing Xiaomi's newly revealed Cyber One V2 with Tesla's Optimus Gen 2, suggesting frame-by-frame replication of Tesla's approach. Elon's brief response teasing 'Optimus 3 is special' signals Tesla's continued innovation pipeline in robotics, implying the company plans to stay ahead of competitors through next-generation product development rather than design protection alone. This reflects a competitive dynamics lesson in hardware/robotics: sustained innovation velocity matters more than protecting current designs when competitors can reverse-engineer products quickly.",
+    "is_relevant": true,
+    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Optimus 3 is special</p>&mdash; Elon Musk (@elonmusk) <a href=\"https://twitter.com/elonmusk/status/2049372702235136447?ref_src=twsrc%5Etfw\">April 29, 2026</a></blockquote>\n\n"
+  }
+]
