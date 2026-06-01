@@ -1,26 +1,43 @@
 [
   {
-    "id": 2060611306571403589,
-    "text": "@wintonARK Very big upside",
-    "summary": "@wintonARK Very big upside",
-    "created_at": "May 30, 06:36 AM UTC",
-    "url": "https://x.com/elonmusk/status/2060611306571403589",
-    "retweets": 243,
-    "likes": 2417,
-    "replies": 261,
-    "impressions": 133490,
-    "score": 3668,
+    "id": 2061221391937217011,
+    "text": "Try Tesla self-driving https://t.co/WAlIs7rCbV",
+    "summary": "Try Tesla self-driving",
+    "created_at": "May 31, 11:00 PM UTC",
+    "url": "https://x.com/elonmusk/status/2061221391937217011",
+    "retweets": 3493,
+    "likes": 25201,
+    "replies": 2450,
+    "impressions": 7290809,
+    "score": 40580,
+    "virality": "\ud83d\udcc8 Trending",
+    "parent": null,
+    "ai_summary": "Elon Musk promotes Tesla's self-driving capabilities through a direct call-to-action link. This relates to Tesla's autonomous driving technology development and commercialization strategy, demonstrating how the company is moving from testing phase to user adoption by encouraging the public to experience the product firsthand\u2014a key metric for validating the technology's readiness and market viability.",
+    "is_relevant": true,
+    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Try Tesla self-driving <a href=\"https://t.co/WAlIs7rCbV\">https://t.co/WAlIs7rCbV</a></p>&mdash; Elon Musk (@elonmusk) <a href=\"https://x.com/elonmusk/status/2061221391937217011?ref_src=twsrc%5Etfw\">May 31, 2026</a></blockquote>\n\n"
+  },
+  {
+    "id": 2061216006425506189,
+    "text": "@jamesdouma What are the most important things we need to fix?",
+    "summary": "@jamesdouma What are the most important things we need to fix?",
+    "created_at": "May 31, 10:39 PM UTC",
+    "url": "https://x.com/elonmusk/status/2061216006425506189",
+    "retweets": 237,
+    "likes": 2919,
+    "replies": 1436,
+    "impressions": 474831,
+    "score": 6502,
     "virality": "\ud83d\udcca Normal",
     "parent": {
-      "id": 2060417181553463301,
-      "text": "On the remarkable return on capital potential for Starlink on Starship. Including customer acquisition cost, ground station capex, and an expendable top stage, we think SpaceX should be able to launch its 10th commercial starship rocket for ~$500m. The bandwidth it launches",
-      "username": "wintonARK",
-      "name": "Brett Winton",
-      "url": "https://x.com/wintonARK/status/2060417181553463301",
-      "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">On the remarkable return on capital potential for Starlink on Starship.<br><br>Including customer acquisition cost, ground station capex, and an expendable top stage, we think SpaceX should be able to launch its 10th commercial starship rocket for ~$500m.<br><br>The bandwidth it launches\u2026 <a href=\"https://t.co/VObM1ACgnT\">pic.twitter.com/VObM1ACgnT</a></p>&mdash; Brett Winton (@wintonARK) <a href=\"https://x.com/wintonARK/status/2060417181553463301?ref_src=twsrc%5Etfw\">May 29, 2026</a></blockquote>\n\n"
+      "id": 2061162706770764001,
+      "text": "Been making stuff with grok build this last week. The world is feeling very post-scarcity right now.",
+      "username": "jamesdouma",
+      "name": "jimmah",
+      "url": "https://x.com/jamesdouma/status/2061162706770764001",
+      "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Been making stuff with grok build this last week.  The world is feeling very post-scarcity right now.</p>&mdash; jimmah (@jamesdouma) <a href=\"https://x.com/jamesdouma/status/2061162706770764001?ref_src=twsrc%5Etfw\">May 31, 2026</a></blockquote>\n\n"
     },
-    "ai_summary": "Ark Invest analyst discusses SpaceX's unit economics for Starlink deployment via Starship, estimating ~$500M launch costs by the 10th commercial flight when accounting for customer acquisition, ground infrastructure, and expendable stages, with Elon confirming significant profit potential. This reveals critical business strategy around SpaceX's path to profitability through reusable rocket economics and Starlink's satellite internet scalability, demonstrating how manufacturing cost reduction directly enables new revenue models.",
+    "ai_summary": "A developer shares early experience building with Grok, xAI's AI assistant, noting the technology feels transformative enough to create post-scarcity conditions. Elon's follow-up question about prioritizing fixes reveals the product development approach: rather than assuming what matters, directly soliciting user feedback on critical pain points. This reflects a lean product iteration strategy where real user experience data drives the roadmap for AI tooling.",
     "is_relevant": true,
-    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Very big upside</p>&mdash; Elon Musk (@elonmusk) <a href=\"https://x.com/elonmusk/status/2060611306571403589?ref_src=twsrc%5Etfw\">May 30, 2026</a></blockquote>\n\n"
+    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">What are the most important things we need to fix?</p>&mdash; Elon Musk (@elonmusk) <a href=\"https://x.com/elonmusk/status/2061216006425506189?ref_src=twsrc%5Etfw\">May 31, 2026</a></blockquote>\n\n"
   }
 ]
