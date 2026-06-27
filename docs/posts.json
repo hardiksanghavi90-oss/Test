@@ -1,26 +1,26 @@
 [
   {
-    "id": 2070252994017300636,
-    "text": "@wholemars @TovikkaX The production shortfall relative to demand is insane. MUCH higher production is needed.",
-    "summary": "@wholemars @TovikkaX The production shortfall relative to demand is insane. MUCH higher production is needed.",
-    "created_at": "Jun 25, 09:09 PM UTC",
-    "url": "https://x.com/elonmusk/status/2070252994017300636",
-    "retweets": 315,
-    "likes": 3434,
-    "replies": 205,
-    "impressions": 571410,
-    "score": 4789,
+    "id": 2070521686231822709,
+    "text": "@IBMNews How many atoms wide is the smallest feature size?",
+    "summary": "@IBMNews How many atoms wide is the smallest feature size?",
+    "created_at": "Jun 26, 02:56 PM UTC",
+    "url": "https://x.com/elonmusk/status/2070521686231822709",
+    "retweets": 175,
+    "likes": 4396,
+    "replies": 536,
+    "impressions": 470457,
+    "score": 5993,
     "virality": "\ud83d\udcca Normal",
     "parent": {
-      "id": 2070189756852658406,
-      "text": "@elonmusk @TovikkaX Is there anything we can do to solve this beyond increasing production?",
-      "username": "wholemars",
-      "name": "Whole Mars Catalog",
-      "url": "https://x.com/wholemars/status/2070189756852658406",
-      "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">Is there anything we can do to solve this beyond increasing production?</p>&mdash; Whole Mars Catalog (@wholemars) <a href=\"https://x.com/wholemars/status/2070189756852658406?ref_src=twsrc%5Etfw\">June 25, 2026</a></blockquote>\n\n"
+      "id": 2070100944017092734,
+      "text": "The world\u2019s first sub\u20111 nanometer node chip is here. Delivering 70% greater energy efficiency, this breakthrough powers a new era of computing that\u2019s more capable while using less energy. Dig into this next-gen tech:",
+      "username": "IBMNews",
+      "name": "IBM News",
+      "url": "https://x.com/IBMNews/status/2070100944017092734",
+      "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">The world\u2019s first sub\u20111 nanometer node chip is here. <br><br>Delivering 70% greater energy efficiency, this breakthrough powers a new era of computing that\u2019s more capable while using less energy.<br><br>Dig into this next-gen tech: <a href=\"https://t.co/NkzAahH49S\">https://t.co/NkzAahH49S</a> <a href=\"https://t.co/zfgZK77iu4\">pic.twitter.com/zfgZK77iu4</a></p>&mdash; IBM News (@IBMNews) <a href=\"https://x.com/IBMNews/status/2070100944017092734?ref_src=twsrc%5Etfw\">June 25, 2026</a></blockquote>\n\n"
     },
-    "ai_summary": "The conversation discusses severe supply chain cost inflation affecting manufacturing, with Elon noting unprecedented price increases across production inputs. When asked about solutions beyond production increases, Elon identifies the core issue: massive production shortfalls relative to demand that require significantly higher manufacturing capacity to address. This relates to Tesla's manufacturing and scaling challenges, highlighting how supply constraints and cost pressures directly impact a company's ability to meet market demand.",
+    "ai_summary": "IBM announced a breakthrough sub-1 nanometer chip node with 70% greater energy efficiency, and Musk questioned the actual atomic-scale dimensions of the smallest feature size\u2014a critical technical clarification. This reflects the engineering rigor required when evaluating semiconductor advances, as marketing claims about 'node names' often don't correspond to literal feature sizes, a key consideration for companies like Tesla and SpaceX that depend on cutting-edge chip performance for autonomous systems and avionics.",
     "is_relevant": true,
-    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">The production shortfall relative to demand is insane. MUCH higher production is needed.</p>&mdash; Elon Musk (@elonmusk) <a href=\"https://x.com/elonmusk/status/2070252994017300636?ref_src=twsrc%5Etfw\">June 25, 2026</a></blockquote>\n\n"
+    "embed_html": "<blockquote class=\"twitter-tweet\" data-width=\"550\" data-dnt=\"true\" data-theme=\"dark\"><p lang=\"en\" dir=\"ltr\">How many atoms wide is the smallest feature size?</p>&mdash; Elon Musk (@elonmusk) <a href=\"https://x.com/elonmusk/status/2070521686231822709?ref_src=twsrc%5Etfw\">June 26, 2026</a></blockquote>\n\n"
   }
 ]
